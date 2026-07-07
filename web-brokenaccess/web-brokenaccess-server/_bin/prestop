@@ -1,0 +1,4 @@
+#!/bin/bash
+# prestop script to dump juice-shop logs for grading
+# Since journalctl is restricted to root/systemd-journal, we run with sudo.
+sudo journalctl -u juice-shop --no-pager > /home/ubuntu/.local/result/journalctl.stdout.log
