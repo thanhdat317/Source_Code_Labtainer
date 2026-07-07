@@ -1,0 +1,13 @@
+#!/bin/bash
+# prestop script to dump juice-shop logs for grading
+# Since journalctl is restricted to root/systemd-journal, we run with sudo.
+mkdir -p /home/ubuntu/.local/result
+sudo journalctl -u juice-shop --no-pager > /home/ubuntu/.local/result/journalctl.stdout
+sudo journalctl -u juice-shop --no-pager > /home/ubuntu/.local/result/journalctl.stdout.log
+
+# Check if 1-star feedback was deleted and append solved message
+count=$(sudo sqlite3 /juice-shop_11.1.2/data/juiceshop.sqlite "SELECT COUNT(*) FROM Feedbacks WHERE rating = 1;")
+if [ "$count" -eq 0 ]; then
+  echo "info: Challenge \"One-Star Feedback\" solved!" >> /home/ubuntu/.local/result/journalctl.stdout
+  echo "info: Challenge \"One-Star Feedback\" solved!" >> /home/ubuntu/.local/result/journalctl.stdout.log
+fi
