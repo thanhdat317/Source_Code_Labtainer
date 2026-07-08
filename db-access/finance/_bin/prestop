@@ -1,0 +1,2 @@
+#!/bin/bash
+su - nancy -c 'mysql -u nancy -h database -ppass4nancy -t -f < nancy.sql 2>&1'

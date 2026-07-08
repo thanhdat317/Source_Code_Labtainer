@@ -1,0 +1,2 @@
+#!/bin/bash
+su - steven -c 'mysql -u steven -h database -ppass4steven -t -f < steven.sql 2>&1'

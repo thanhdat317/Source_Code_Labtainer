@@ -1,0 +1,5 @@
+#!/bin/bash
+mkdir -p /home/ubuntu/.local/result
+if [ -f /var/log/mysql/mysql.log ]; then
+    cp /var/log/mysql/mysql.log /home/ubuntu/.local/result/mysql.log
+fi

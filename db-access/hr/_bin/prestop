@@ -1,0 +1,2 @@
+#!/bin/bash
+su - susan -c 'mysql -u susan -h database -ppass4susan -t -f < susan.sql 2>&1'
