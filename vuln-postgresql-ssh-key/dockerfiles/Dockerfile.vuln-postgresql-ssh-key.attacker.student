@@ -1,0 +1,25 @@
+ARG registry
+FROM $registry/labtainer.kali
+
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+
+ADD $labdir/sys_$lab.tar.gz /
+#
+RUN useradd -ms /bin/bash $user_name
+RUN echo "$user_name:$password" | chpasswd
+RUN adduser $user_name sudo
+
+USER $user_name
+ENV HOME /home/$user_name
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+
+USER root
+RUN systemctl enable rc-local
+RUN systemctl disable postgresql
+CMD ["/sbin/init"]

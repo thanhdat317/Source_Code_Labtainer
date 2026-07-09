@@ -1,0 +1,14 @@
+#!/bin/bash
+# prestop script for victim container to dump logs before stop
+mkdir -p /home/ubuntu/.local/result
+if [ -f /var/log/postgresql/postgresql-8.3-main.log ]; then
+    cp /var/log/postgresql/postgresql-8.3-main.log /home/ubuntu/.local/result/postgresql.stdout.log
+else
+    touch /home/ubuntu/.local/result/postgresql.stdout.log
+fi
+if [ -f /var/log/auth.log ]; then
+    cp /var/log/auth.log /home/ubuntu/.local/result/auth.stdout.log
+else
+    touch /home/ubuntu/.local/result/auth.stdout.log
+fi
+chmod -R 777 /home/ubuntu/.local/result
