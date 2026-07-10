@@ -1,0 +1,95 @@
+#
+# Labtainer Dockerfile
+#
+#  This is the default Labtainer Dockerfile template, plesae choose the appropriate
+#  base image below.
+#
+# The labtainer.base image includes the following packages:
+#    build-essential  expect  file  gcc-multilib  gdb  iputils-ping  less  man  manpages-dev 
+#    net-tools  openssh-client  python  sudo  tcl8.6  vim  zip  hexedit  rsyslog
+#
+# The labtainer.network image adds the following packages:
+#   openssl openssh-server openvpn wget tcpdump  update-inetd  xinetd
+#
+ARG registry
+FROM $registry/labtainer.juiceshop
+#
+#  lab is the fully qualified image name, e.g., mylab.some_container.student
+#  labdir is the name of the lab, e.g., mylab 
+#  imagedir is the name of the container
+#  user_name is the USER from the start.config, if other than ubuntu,
+#            then that user must be added in this dockerfile
+#            before the USER command
+#
+ARG lab
+ARG labdir
+ARG imagedir
+ARG user_name
+ARG password
+ARG apt_source
+ARG version
+LABEL version=$version
+ENV APT_SOURCE $apt_source
+RUN /usr/bin/apt-source.sh
+#
+#  put package installation here
+ENV NODE_ENV temp
+# Download and install Node 8
+RUN wget -q https://nodejs.org/dist/v8.17.0/node-v8.17.0-linux-x64.tar.xz && \
+    tar -xf node-v8.17.0-linux-x64.tar.xz -C /opt && \
+    rm -f node-v8.17.0-linux-x64.tar.xz && \
+    ln -sf /opt/node-v8.17.0-linux-x64/bin/node /usr/bin/node && \
+    ln -sf /opt/node-v8.17.0-linux-x64/bin/npm /usr/bin/npm
+
+# Download and extract Juice Shop v7.5.1
+RUN wget -q https://github.com/juice-shop/juice-shop/releases/download/v7.5.1/juice-shop-7.5.1_node8_linux_x64.tgz && \
+    tar -xf juice-shop-7.5.1_node8_linux_x64.tgz -C / && \
+    rm -f juice-shop-7.5.1_node8_linux_x64.tgz
+
+# Add route aliases for compatibility with the lab scenario
+RUN sed -i "s|app.get('/rest/product/search', search())|app.get('/rest/product/search', search()); app.get('/rest/products/search', search())|g" /juice-shop_7.5.1/server.js && \
+    sed -i "s|app.patch('/rest/product/reviews', insecurity.isAuthorized(), updateProductReviews())|app.patch('/rest/product/reviews', insecurity.isAuthorized(), updateProductReviews()); app.patch('/rest/products/reviews', insecurity.isAuthorized(), updateProductReviews())|g" /juice-shop_7.5.1/server.js
+
+# Add role field to User model for Mass Assignment challenge compatibility
+RUN python3 -c "content = open('/juice-shop_7.5.1/models/user.js').read(); content = content.replace('this.setDataValue(\'password\', insecurity.hash(clearTextPassword))\n      }\n    }', 'this.setDataValue(\'password\', insecurity.hash(clearTextPassword))\n      }\n    },\n    role: {\n      type: STRING,\n      defaultValue: \'customer\'\n    }'); open('/juice-shop_7.5.1/models/user.js', 'w').write(content)"
+
+# Modify verify.js to grade Product Tampering based on new manual scenario (Product 2 description and Product 8 price)
+RUN python3 -c "import base64; exec(base64.b64decode('bGluZXMgPSBvcGVuKCcvanVpY2Utc2hvcF83LjUuMS9yb3V0ZXMvdmVyaWZ5LmpzJykucmVhZCgpLnNwbGl0bGluZXMoKQoKbmV3X2xpbmVzID0gW10Kc2tpcF9saW5lcyA9IDAKZm9yIGksIGxpbmUgaW4gZW51bWVyYXRlKGxpbmVzKToKICAgIGlmIHNraXBfbGluZXMgPiAwOgogICAgICAgIHNraXBfbGluZXMgLT0gMQogICAgICAgIGNvbnRpbnVlCiAgICBpZiAidXRpbHMubm90U29sdmVkKGNoYWxsZW5nZXMuY2hhbmdlUHJvZHVjdENoYWxsZW5nZSkgJiYgcHJvZHVjdHMub3NhZnQiIGluIGxpbmU6CiAgICAgICAgbmV3X2xpbmVzLmFwcGVuZCgiICBpZiAodXRpbHMubm90U29sdmVkKGNoYWxsZW5nZXMuY2hhbmdlUHJvZHVjdENoYWxsZW5nZSkpIHsiKQogICAgICAgIG5ld19saW5lcy5hcHBlbmQoIiAgICBjaGFuZ2VQcm9kdWN0Q2hhbGxlbmdlKCkiKQogICAgICAgIG5ld19saW5lcy5hcHBlbmQoIiAgfSIpCiAgICAgICAgc2tpcF9saW5lcyA9IDIKICAgIGVsc2U6CiAgICAgICAgbmV3X2xpbmVzLmFwcGVuZChsaW5lKQoKbGluZXMgPSBuZXdfbGluZXMKCm5ld19saW5lcyA9IFtdCnNraXBfbGluZXMgPSAwCmZvciBpLCBsaW5lIGluIGVudW1lcmF0ZShsaW5lcyk6CiAgICBpZiBza2lwX2xpbmVzID4gMDoKICAgICAgICBza2lwX2xpbmVzIC09IDEKICAgICAgICBjb250aW51ZQogICAgaWYgImZ1bmN0aW9uIGNoYW5nZVByb2R1Y3RDaGFsbGVuZ2UgKG9zYWZ0KSB7IiBpbiBsaW5lOgogICAgICAgIG5ld19saW5lcy5hcHBlbmQoImZ1bmN0aW9uIGNoYW5nZVByb2R1Y3RDaGFsbGVuZ2UgKCkgeyIpCiAgICAgICAgbmV3X2xpbmVzLmFwcGVuZCgiICBtb2RlbHMuUHJvZHVjdC5maW5kT25lKHsgd2hlcmU6IHsgaWQ6IDIgfSB9KS50aGVuKHByb2R1Y3QyID0+IHsiKQogICAgICAgIG5ld19saW5lcy5hcHBlbmQoIiAgICBpZiAocHJvZHVjdDIgJiYgcHJvZHVjdDIuZGVzY3JpcHRpb24gIT09ICdNYWRlIGZyb20gb3JhbmdlcyBoYW5kLXBpY2tlZCBieSBVbmNsZSBEaXR0bWV5ZXIuJykgeyIpCiAgICAgICAgbmV3X2xpbmVzLmFwcGVuZCgiICAgICAgbW9kZWxzLlByb2R1Y3QuZmluZE9uZSh7IHdoZXJlOiB7IGlkOiA4IH0gfSkudGhlbihwcm9kdWN0OCA9PiB7IikKICAgICAgICBuZXdfbGluZXMuYXBwZW5kKCIgICAgICAgIGlmIChwcm9kdWN0OCAmJiBwcm9kdWN0OC5wcmljZSA9PT0gMTAuOTkpIHsiKQogICAgICAgIG5ld19saW5lcy5hcHBlbmQoIiAgICAgICAgICB1dGlscy5zb2x2ZShjaGFsbGVuZ2VzLmNoYW5nZVByb2R1Y3RDaGFsbGVuZ2UpIikKICAgICAgICBuZXdfbGluZXMuYXBwZW5kKCIgICAgICAgIH0iKQogICAgICAgIG5ld19saW5lcy5hcHBlbmQoIiAgICAgIH0pIikKICAgICAgICBuZXdfbGluZXMuYXBwZW5kKCIgICAgfSIpCiAgICAgICAgbmV3X2xpbmVzLmFwcGVuZCgiICB9KSIpCiAgICAgICAgbmV3X2xpbmVzLmFwcGVuZCgifSIpCiAgICAgICAgc2tpcF9saW5lcyA9IDgKICAgIGVsc2U6CiAgICAgICAgbmV3X2xpbmVzLmFwcGVuZChsaW5lKQoKb3BlbignL2p1aWNlLXNob3BfNy41LjEvcm91dGVzL3ZlcmlmeS5qcycsICd3Jykud3JpdGUoJ1xuJy5qb2luKG5ld19saW5lcykp'))"
+#
+#
+#
+# Install the system files found in the _system directory
+#
+ADD $labdir/$imagedir/sys_tar/sys.tar /
+ADD $labdir/sys_$lab.tar.gz /
+#
+RUN useradd -ms /bin/bash $user_name
+RUN echo "$user_name:$password" | chpasswd
+RUN adduser $user_name sudo
+# replace above with below for centos/fedora
+#RUN usermod $user_name -a -G wheel
+
+
+#
+#  **** Perform all root operations, e.g.,           ****
+#  **** "apt-get install" prior to the USER command. ****
+#
+USER $user_name
+ENV HOME /home/$user_name
+#
+# Install files in the user home directory
+#
+ADD $labdir/$imagedir/home_tar/home.tar $HOME
+# remove after docker fixes problem with empty tars
+#
+RUN rm -f $HOME/home.tar
+ADD $labdir/$lab.tar.gz $HOME
+RUN sudo cp /home/ubuntu/temp.yml /juice-shop_7.5.1/config
+#
+#
+#  The first thing that executes on the container.
+#
+USER root
+CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]
+
+
