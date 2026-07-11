@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành - Web XXE</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-easy {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .badge-network {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .badge-protocol {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 12pt;
+      color: #2e4053;
+      margin: 16px 0 6px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd {
+      color: #89dceb;
+    }
+
+    pre .comment {
+      color: #8b93a8;
+      font-style: italic;
+    }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .box strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .topo-node .node-label {
+      font-size: 10pt;
+      opacity: 0.9;
+    }
+
+    .topo-node .node-ip {
+      font-size: 9pt;
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 20px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .topo-arrow .arrow-line {
+      width: 120px;
+      height: 2px;
+      background: #27ae60;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body {
+      padding: 14px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+
+    .task-group {
+      margin: 18px 0;
+    }
+
+    .task-group-title {
+      font-size: 12.5pt;
+      color: #003087;
+      font-weight: bold;
+      padding: 8px 0 4px 4px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">Web XXE - Khai thác lỗ hổng OWASP XML eXternal Entity Injection</div>
+      <div class="meta">
+        <span class="badge badge-protocol">Mức độ: Trung bình</span>
+        <span class="badge badge-network">An toàn ứng dụng Web</span>
+        <span class="badge badge-protocol">XML External Entity (XXE)</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+
+    <table>
+      <tr>
+        <th style="width: 220px;">Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td><strong>Tên Lab</strong></td>
+        <td><code>web-xxe</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mức độ</strong></td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td><strong>Công cụ sử dụng</strong></td>
+        <td><code>OWASP ZAP</code>, <code>Firefox</code></td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <p>Bài lab giúp sinh viên hiểu rõ bản chất và cách phòng chống lỗ hổng XXE (XML eXternal Entity Injection)
+      thông qua thực hành các kỹ năng sau:</p>
+    <ul>
+      <li><strong>Hiểu nguyên nhân:</strong> Nắm vững cơ chế phát sinh lỗ hổng khi ứng dụng xử lý dữ liệu đầu vào
+        XML thiếu an toàn.</li>
+      <li><strong>Khai thác thực tế:</strong> Biết cách phát hiện và thực hiện khai thác lỗ hổng XXE trong môi
+        trường giả lập.</li>
+      <li><strong>Phòng chống hiệu quả:</strong> Áp dụng các biện pháp cấu hình và lập trình an toàn để ngăn chặn
+        lỗ hổng này.</li>
+    </ul>
+
+    <h3>Kỹ năng đạt được</h3>
+    <ul>
+      <li>Sử dụng OWASP ZAP (Break, History) để chặn bắt và chỉnh sửa HTTP Request nhằm chèn payload XML độc
+        hại.</li>
+      <li>Phân tích cấu trúc tài liệu XML, nhận diện khai báo Document Type Declaration (DTD) và External
+        Entity.</li>
+      <li>Khai thác lỗ hổng XXE để đọc tệp tùy ý trên máy chủ (Local File Disclosure).</li>
+      <li>Đánh giá nguyên nhân gốc rễ và đề xuất biện pháp phòng chống lỗ hổng XXE.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+
+    <strong>Tình huống:</strong><br />
+    Một doanh nghiệp vừa triển khai một hệ thống web cho phép người dùng gửi dữ liệu dưới định dạng XML để xử lý
+    thông tin (chức năng gửi Complaint). Do nhóm phát triển sử dụng XML Parser với cấu hình mặc định và không vô
+    hiệu hóa việc xử lý External Entity, ứng dụng có nguy cơ tồn tại lỗ hổng XML External Entity (XXE). Sinh viên
+    đóng vai chuyên viên kiểm thử an toàn ứng dụng Web (Web Application Penetration Tester), được giao nhiệm vụ
+    đánh giá mức độ an toàn của ứng dụng trước khi đưa vào vận hành chính thức.
+
+    <p><strong>Vai trò của sinh viên:</strong></p>
+    <ul>
+      <li>Cấu hình OWASP ZAP làm Proxy để ghi nhận và phân tích lưu lượng HTTP giữa trình duyệt và máy chủ.</li>
+      <li>Khai thác lỗ hổng XXE bằng các tệp XML mẫu (evil1.xml, evil2.xml) để đọc tệp <code>/etc/passwd</code>
+        trên máy chủ.</li>
+      <li>Chỉnh sửa tệp XML tùy chỉnh (evil3.xml) nhằm đọc một tệp mục tiêu khác trên hệ thống.</li>
+      <li>Tạo báo cáo kết quả kiểm thử bằng OWASP ZAP và đối chiếu với nhật ký (log) của máy chủ.</li>
+    </ul>
+
+    <h3>Sơ đồ mạng</h3>
+    <div class="topology">
+      <div class="topo-diagram">
+        <div class="topo-node">
+          <div>Máy trạm sinh viên</div>
+          <div class="node-label">Firefox + OWASP ZAP</div>
+          <div class="node-ip">192.168.99.101</div>
+        </div>
+
+        <div class="topo-arrow">
+          <div class="arrow-label">HTTP qua Proxy 127.0.0.1:8080</div>
+          <div class="arrow-line"></div>
+          <div style="font-size: 9pt; color: #555;">cổng 3000</div>
+        </div>
+
+        <div class="topo-node">
+          <div>Máy chủ web</div>
+          <div class="node-label">OWASP Juice Shop</div>
+          <div class="node-ip">192.168.99.100</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>Kiến thức về XML, DTD và lỗ hổng XXE</h3>
+    <p>Sinh viên cần nắm được cấu trúc của một tài liệu XML, gồm các thành phần như Element, Attribute, Entity và
+      Document Type Declaration (DTD), cũng như vai trò của DTD trong việc định nghĩa Entity. Đây chính là cơ sở
+      để hiểu nguyên nhân phát sinh lỗ hổng XXE: khi XML Parser của ứng dụng được cấu hình cho phép xử lý External
+      Entity mà không kiểm soát, kẻ tấn công có thể lợi dụng để đọc các tệp trên máy chủ, truy cập tài nguyên nội
+      bộ hoặc thực hiện yêu cầu đến hệ thống khác thông qua SSRF.</p>
+
+    <h3>Kiến thức về HTTP Request và XML Payload</h3>
+    <p>Trong bài lab, sinh viên sẽ nhiều lần chỉnh sửa các HTTP Request chứa dữ liệu XML để thực hiện khai thác.
+      Vì vậy, sinh viên cần nắm được cấu trúc của HTTP Request (Request Line, Header, Body), đồng thời biết cách
+      xây dựng và chỉnh sửa XML Payload để gửi các yêu cầu kiểm thử đến máy chủ.</p>
+
+    <h3>Công cụ sử dụng trong bài</h3>
+    <table>
+      <tr>
+        <th style="width: 200px;">Công cụ / Chức năng</th>
+        <th>Mô tả tác dụng</th>
+      </tr>
+      <tr>
+        <td><code>Break</code> (OWASP ZAP)</td>
+        <td>Tạm dừng request/response để quan sát và chỉnh sửa nội dung XML gửi lên máy chủ.</td>
+      </tr>
+      <tr>
+        <td><code>Save Raw</code></td>
+        <td>Lưu lại nội dung Response Body nhận được (ví dụ nội dung tệp <code>/etc/passwd</code>) ra tệp tin.</td>
+      </tr>
+      <tr>
+        <td><code>Report</code> (Application)</td>
+        <td>Xuất báo cáo HTML tổng hợp các request/response và cảnh báo đã ghi nhận trong phiên kiểm thử.</td>
+      </tr>
+    </table>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+    <div class="box box-info">
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
+      <code>labtainer web-xxe</code>
+    </div>
+
+    <h3>Tài khoản được cấu hình sẵn</h3>
+    <table>
+      <tr>
+        <th>Tài khoản</th>
+        <th style="width: 160px;">Mật khẩu</th>
+        <th>Hệ thống</th>
+      </tr>
+      <tr>
+        <td><code>admin@juice.org</code></td>
+        <td><code>admin123</code></td>
+        <td>Tài khoản quản trị đăng nhập web</td>
+      </tr>
+      <tr>
+        <td><code>jim@juice.org</code></td>
+        <td><code>ncc-1701</code></td>
+        <td>Đăng nhập web</td>
+      </tr>
+      <tr>
+        <td><code>mc.safesearch@juice.org</code></td>
+        <td><code>Mr. N00dles</code></td>
+        <td>Đăng nhập web</td>
+      </tr>
+      <tr>
+        <td><code>Ubuntu</code></td>
+        <td><code>ubuntu</code></td>
+        <td>Máy trạm sinh viên, máy chủ chứa lỗ hổng, máy trạm tấn công</td>
+      </tr>
+    </table>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 - Mở Firefox và truy cập vào máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên (web-xxe), mở trình duyệt Firefox:</p>
+        <pre><span class="cmd">firefox &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Trên Firefox, truy cập đường dẫn của ứng dụng web:</p>
+        <div class="box box-info">
+          <code>http://192.168.99.100:3000</code>
+        </div>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Truy cập thành công giao diện của ứng dụng OWASP Juice
+          Shop trên Firefox.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 - Khởi động và cấu hình OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên (web-xxe), khởi động OWASP ZAP:</p>
+        <pre><span class="cmd">owasp-zap &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Khi OWASP ZAP mở lên và yêu cầu nhập thông tin, sinh viên chọn "yes, I want to
+          persist this session with the name based on the current timestamp" rồi chọn <strong>Start</strong>.</p>
+
+        <p><strong>Bước 3:</strong> Nếu xuất hiện hộp thoại "Manage Add-on", sinh viên chọn <strong>Close</strong>
+          để tiếp tục.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> OWASP ZAP khởi động thành công và sẵn sàng để cấu hình
+          làm proxy.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 - Cấu hình Firefox Proxy để sử dụng OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Cấu hình OWASP ZAP làm proxy trung gian để bắt và phân tích các gói tin HTTP
+          truyền từ trình duyệt Firefox trên máy trạm sinh viên. Thực hiện cấu hình trên Firefox theo các bước
+          sau:</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox của máy tính sinh viên, mở <strong>Preferences</strong>.</p>
+        <p><strong>Bước 2:</strong> Trong ô tìm kiếm cài đặt, gõ <code>proxy</code>.</p>
+        <p><strong>Bước 3:</strong> Trong mục <strong>Network Proxy</strong>, chọn <strong>Settings</strong>.</p>
+        <p><strong>Bước 4:</strong> Chọn <strong>Manual proxy configuration</strong> (Cấu hình proxy thủ công).</p>
+        <p><strong>Bước 5:</strong> Tại trường HTTP Proxy, nhập <code>127.0.0.1</code>, Port nhập <code>8080</code>.
+        </p>
+        <p><strong>Bước 6:</strong> Chọn thêm <strong>Use this proxy server for all protocols</strong> (Sử dụng máy
+          chủ proxy này cho tất cả các giao thức).</p>
+        <p><strong>Bước 7:</strong> Chọn <strong>OK</strong> để chấp nhận các cài đặt.</p>
+
+        <p>Sau khi cấu hình xong, thực hiện các bước sau để xác nhận Firefox đang sử dụng ZAP làm proxy:</p>
+        <p><strong>Bước 8:</strong> Làm mới trang web <code>192.168.99.100:3000</code>. Một cảnh báo bảo mật với
+          thông báo "Kết nối của bạn không an toàn" sẽ xuất hiện.</p>
+        <p><strong>Bước 9:</strong> Chọn <strong>Advanced</strong> để xem chi tiết chứng chỉ SSL (thường hiển thị
+          lỗi <code>SEC_ERROR_UNKNOWN_ISSUER</code>), sau đó chọn <strong>Add Exception</strong> để chấp nhận
+          chứng chỉ này.</p>
+        <p><strong>Bước 10:</strong> Tại cửa sổ xác nhận, sinh viên tiếp tục bấm chọn <strong>Confirm Security
+            Exception</strong>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Firefox truy cập được ứng dụng web qua proxy của OWASP
+          ZAP, tab <strong>History</strong> trong ZAP bắt đầu ghi nhận các request.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 4 - Khai thác XXE để thu thập tệp tin</div>
+      <div class="task-body">
+        <p>Theo hướng dẫn WSTG-INPV-07, kiểm thử tiêm XML xảy ra khi sinh viên cố gắng đưa một tài liệu XML chứa
+          mã độc vào ứng dụng web. Nếu trình phân tích XML của hệ thống xử lý tệp tin này, cuộc tấn công xem như
+          thành công. Tuy nhiên, hành động này có thể làm treo hoặc đổ vỡ trình phân tích XML của ứng dụng. Do đó,
+          để đảm bảo an toàn cho hệ thống và giúp sinh viên hiểu sâu hơn, bài lab sẽ đưa ra hai phương pháp tiếp
+          cận khác nhau nhưng cùng thực hiện một nhiệm vụ khai thác như nhau.</p>
+
+        <p><strong>Bước 1:</strong> Trên giao diện dòng lệnh máy sinh viên, sinh viên thực hiện mở 2 tệp
+          <code>evil1.xml</code> và <code>evil2.xml</code> và thực hiện đọc nội dung 2 tệp để hiểu cách chúng
+          được xây dựng. Sau đó sinh viên tiến hành so sánh sự khác nhau giữa 2 tệp và chú ý đến đoạn khai báo
+          External Entity dùng để đọc tệp <code>/etc/passwd</code>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Trên giao diện dòng lệnh máy sinh viên web-xxe, sinh viên tiến hành mở trình
+          duyệt và truy cập <code>http://192.168.99.100:3000</code>, sau đó thực hiện đăng nhập bằng một tài
+          khoản hợp lệ.</p>
+
+        <p><strong>Bước 3:</strong> Sau khi đăng nhập thành công, thực hiện chọn chức năng <strong>Complaint</strong>.
+          Chức năng này sẽ cho phép gửi phản ánh kèm theo một tệp tin đính kèm.</p>
+
+        <p><strong>Bước 4:</strong> Mở OWASP ZAP và bật <strong>Break</strong>. Khi Break được bật, mỗi yêu cầu
+          hoặc phản hồi sẽ tạm dừng để bạn quan sát. Sau khi kiểm tra xong, nhấn <strong>Continue</strong> để cho
+          phép yêu cầu hoặc phản hồi tiếp tục xử lý.</p>
+
+        <p><strong>Bước 5:</strong> Tải lên tệp XML độc hại: nhập nội dung bất kỳ vào ô <strong>Message</strong>,
+          chọn <strong>Browse</strong> để tải tệp lên. Vì hộp thoại mặc định chỉ hiển thị tệp PDF, hãy chuyển sang
+          <strong>All Files</strong> để hiển thị tất cả các loại tệp, chọn tệp <code>evil1.xml</code> rồi nhấn
+          <strong>Submit</strong>.
+        </p>
+
+        <p><strong>Bước 6:</strong> Quan sát phản hồi trong OWASP ZAP. Nếu khai thác thành công, tại cửa sổ Break
+          của OWASP ZAP, phản hồi sẽ bao gồm nội dung xác nhận complaint đã được gửi và nội dung của tệp
+          <code>/etc/passwd</code> được máy chủ trả về do XML độc hại được xử lý.</p>
+
+        <p><strong>Bước 7:</strong> Lưu phản hồi: trong cửa sổ Break, nhấp chuột phải vào phản hồi, chọn
+          <strong>Save Raw</strong>, chỉ lưu phần Response Body và đặt tên tệp là <code>evil1.raw</code>. Sau khi
+          lưu xong, nhấn <strong>Continue</strong> để phản hồi được gửi về trình duyệt.
+        </p>
+
+        <p><strong>Bước 8:</strong> Kiểm tra với tệp thứ hai: thực hiện lại các bước từ Bước 5 đến Bước 7, nhưng
+          thay tệp tải lên bằng <code>evil2.xml</code>. So sánh kết quả thu được với lần thử sử dụng
+          <code>evil1.xml</code> và xác định xem cả hai tệp có đều đọc được nội dung của <code>/etc/passwd</code>
+          hay không.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Khai thác thành công lỗ hổng XXE với cả hai tệp
+          evil1.xml và evil2.xml, thu được nội dung tệp <code>/etc/passwd</code> và lưu lại được các phản hồi
+          tương ứng.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong><br />
+          So sánh cấu trúc khai báo Entity giữa evil1.xml và evil2.xml, vì sao cả hai cách khai báo khác nhau này
+          đều có thể khiến máy chủ đọc và trả về nội dung tệp <code>/etc/passwd</code>?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 5 - Khai thác XXE bằng tệp XML tùy chỉnh</div>
+      <div class="task-body">
+        <p>Ở nhiệm vụ trước, bạn đã sử dụng các tệp XML được chuẩn bị sẵn để khai thác lỗ hổng XXE. Trong nhiệm vụ
+          này, bạn sẽ tự chỉnh sửa một tệp XML nhằm yêu cầu máy chủ đọc một tệp khác trên hệ thống.</p>
+
+        <p><strong>Bước 1:</strong> Trên máy của sinh viên, mở tệp <code>evil3.xml</code>.</p>
+        <p><strong>Bước 2:</strong> Quan sát cấu trúc của tệp và xác định phần khai báo External Entity (XXE).</p>
+        <p><strong>Bước 3:</strong> Chỉnh sửa nội dung của tệp để thay đổi đường dẫn của thực thể XML, thực hiện
+          đọc tệp <code>/opt/secret/flag.txt</code>.</p>
+        <p><strong>Bước 4:</strong> Thực hiện lặp lại các bước như ở Nhiệm vụ 4 (Bước 2 đến Bước 7), lợi dụng tính
+          năng Complaint bị lỗi để thực hiện đọc tệp theo yêu cầu.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Chỉnh sửa thành công evil3.xml và đọc được nội dung tệp
+          <code>/opt/secret/flag.txt</code> từ máy chủ.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong><br />
+          Cần thay đổi những phần nào trong khai báo Entity của evil3.xml để trỏ tới một tệp mục tiêu khác trên
+          hệ thống? Nêu nguyên nhân gốc rễ cho phép việc thay đổi đường dẫn này thành công.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 6 - Tạo báo cáo và kiểm tra nhật ký hệ thống</div>
+      <div class="task-body">
+        <p><strong>6.1 - Tạo báo cáo trong OWASP ZAP</strong></p>
+        <p><strong>Bước 1:</strong> Trong OWASP ZAP, khi đã xác định được các lỗ hổng, vào mục
+          <strong>Application</strong>, chọn <strong>Report</strong> và chọn lưu báo cáo dạng HTML.
+        </p>
+        <p><strong>Bước 2:</strong> Lưu báo cáo vào thư mục chính (home) của máy tính web-xxe, đặt tên tệp là
+          <code>report_zap</code>.
+        </p>
+
+        <p><strong>6.2 - Kiểm tra nhật ký trên máy chủ</strong></p>
+        <p><strong>Bước 3:</strong> Trên máy chủ web, nhập lệnh sau để xem nhật ký hệ thống:</p>
+        <pre><span class="cmd">sudo journalctl -u juice-shop</span></pre>
+        <p><strong>Bước 4:</strong> Dùng phím space để cuộn xuống đến cuối, ghi lại bất kỳ nội dung đáng chú ý nào
+          liên quan đến các cuộc tấn công XXE đã thực hiện ở Nhiệm vụ 4 và Nhiệm vụ 5, đối chiếu với kết quả khai
+          thác thu được.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xuất được báo cáo <code>report_zap</code> dạng HTML và
+          xác định được trong nhật ký hệ thống dấu vết của các cuộc tấn công XXE đã thực hiện.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong><br />
+          Dựa trên nội dung nhật ký (log) và báo cáo ZAP thu được, hãy đề xuất ít nhất hai biện pháp phòng chống
+          để ứng dụng không còn bị khai thác lỗ hổng XXE.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+    </div>
+
+  </div>
+</body>
+
+</html>

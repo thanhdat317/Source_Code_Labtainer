@@ -1,0 +1,6 @@
+#!/bin/bash
+# Preserve server-side XXE evidence before Labtainer stops the container.
+set -eu
+result_dir="$HOME/.local/result"
+mkdir -p "$result_dir"
+journalctl -u juice-shop --no-pager 2>/dev/null | grep -F '[LAB-XXE]' > "$result_dir/xxe_results.txt" || true
