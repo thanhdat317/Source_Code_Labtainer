@@ -1,0 +1,6 @@
+#!/bin/bash
+trap "echo Timed out; exit" SIGTERM
+result_dir="$HOME/.local/result"
+mkdir -p "$result_dir"
+nmap -Pn -n -p 22,80,443,3306 www.example.com | tee "$result_dir/remote_nmap.txt"
+wget 198.18.1.194 -T 3 -t 1 |& tee "$result_dir/remote_ws2_wget.txt"

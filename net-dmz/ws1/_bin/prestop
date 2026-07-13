@@ -1,0 +1,6 @@
+#!/bin/bash
+trap "echo Timed out; exit" SIGTERM
+result_dir="$HOME/.local/result"
+mkdir -p "$result_dir"
+nmap -Pn -n -p 22,80,443,3306 www.example.com | tee "$result_dir/local_nmap.txt"
+wget www.google.com -T 5 -t 1 |& tee "$result_dir/internet_wget.txt"
