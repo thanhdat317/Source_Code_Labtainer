@@ -1,0 +1,14 @@
+#!/bin/bash
+# prestop script to dump logs and check SSTI flag
+mkdir -p /home/ubuntu/.local/result
+
+# Dump journalctl logs
+sudo journalctl -u juice-shop --no-pager > /home/ubuntu/.local/result/journalctl.stdout
+
+# Check if flag.txt was read and set as username (stored in database)
+if [ -f /juice-shop_11.1.2/data/juiceshop.sqlite ]; then
+   sqlite3 /juice-shop_11.1.2/data/juiceshop.sqlite "SELECT username FROM Users;" > /home/ubuntu/.local/result/username.txt
+else
+   echo "No DB found" > /home/ubuntu/.local/result/username.txt
+fi
+chmod 666 /home/ubuntu/.local/result/*
