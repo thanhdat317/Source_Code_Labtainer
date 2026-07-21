@@ -1,0 +1,12 @@
+#!/bin/bash
+# Query the sqlite database and write to ~/.local/result/
+outpath=/home/ubuntu/.local/result
+mkdir -p "$outpath"
+db_file="/juice-shop_11.1.2/data/juiceshop.sqlite"
+if [ -f "$db_file" ]; then
+   /usr/bin/sqlite3 "$db_file" "SELECT email FROM Users;" > "$outpath/registered_users.txt"
+   /usr/bin/sqlite3 "$db_file" "SELECT file FROM Complaints;" > "$outpath/complaints_list.txt"
+   /usr/bin/sqlite3 "$db_file" "SELECT description FROM Products WHERE id = 2;" > "$outpath/product2_desc.txt"
+   /usr/bin/sqlite3 "$db_file" "SELECT price FROM Products WHERE id = 6;" > "$outpath/product6_price.txt"
+fi
+sudo journalctl -u juice-shop --no-pager > "$outpath/journalctl.stdout"

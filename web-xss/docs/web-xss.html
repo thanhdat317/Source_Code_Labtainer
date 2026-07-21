@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành - Web XSS</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-easy {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .badge-network {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .badge-protocol {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 12pt;
+      color: #2e4053;
+      margin: 16px 0 6px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd {
+      color: #89dceb;
+    }
+
+    pre .comment {
+      color: #8b93a8;
+      font-style: italic;
+    }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .box strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .topo-node .node-label {
+      font-size: 10pt;
+      opacity: 0.9;
+    }
+
+    .topo-node .node-ip {
+      font-size: 9pt;
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 20px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .topo-arrow .arrow-line {
+      width: 120px;
+      height: 2px;
+      background: #27ae60;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body {
+      padding: 14px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+
+    .task-group {
+      margin: 18px 0;
+    }
+
+    .task-group-title {
+      font-size: 12.5pt;
+      color: #003087;
+      font-weight: bold;
+      padding: 8px 0 4px 4px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">Web Cross-Site Scripting (XSS) - Khai thác lỗ hổng OWASP Cross-Site Scripting</div>
+      <div class="meta">
+        <span class="badge badge-protocol">Mức độ: Trung bình</span>
+        <span class="badge badge-network">An toàn ứng dụng Web</span>
+        <span class="badge badge-easy">Kiểm thử xâm nhập</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+
+    <table>
+      <tr>
+        <th style="width: 220px;">Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td><strong>Tên Lab</strong></td>
+        <td><code>web-xss</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mức độ</strong></td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td><strong>Công cụ sử dụng</strong></td>
+        <td><code>OWASP ZAP</code>, <code>Firefox</code>, <code>curl</code></td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <p>Bài thực hành giúp sinh viên kiểm thử lỗ hổng Cross-Site Scripting (XSS) trên ứng dụng web thương mại điện
+      tử bằng OWASP ZAP, gồm cả Reflected XSS, Stored XSS và khai thác trực tiếp qua REST API bằng curl.</p>
+    <ul>
+      <li>Cấu hình OWASP ZAP làm proxy trung gian để theo dõi và phân tích lưu lượng giữa trình duyệt và máy chủ.</li>
+      <li>Xác định các vị trí tiếp nhận dữ liệu người dùng có khả năng tồn tại lỗ hổng XSS thông qua tab Alerts của
+        OWASP ZAP.</li>
+      <li>Kiểm thử <strong>Reflected XSS</strong> bằng nhiều dạng payload khác nhau để xác minh khả năng khai thác.</li>
+      <li>Kiểm thử <strong>Stored (Persisted) XSS</strong> thông qua chỉnh sửa HTTP Request và chức năng tải tệp.</li>
+      <li>Khai thác XSS trực tiếp qua REST API bằng <strong>curl</strong> mà không cần thao tác qua giao diện
+        Front-End.</li>
+    </ul>
+
+    <h3>Kỹ năng đạt được</h3>
+    <ul>
+      <li>Kỹ năng sử dụng OWASP ZAP: Sites, History, Alerts và Break/Intercept để theo dõi, chặn và chỉnh sửa lưu
+        lượng HTTP/HTTPS.</li>
+      <li>Kỹ năng phân tích và chỉnh sửa HTTP Request (POST, PUT) trước khi gửi tới máy chủ.</li>
+      <li>Kỹ năng nhận diện và khai thác Reflected XSS, Stored XSS trên các điểm nhập liệu khác nhau của ứng dụng.</li>
+      <li>Kỹ năng tương tác trực tiếp với REST API bằng curl để kiểm thử khả năng chèn mã độc vào dữ liệu ứng dụng.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+
+    <strong>Tình huống:</strong><br />
+    Một doanh nghiệp phát triển website thương mại điện tử dựa trên nền tảng OWASP Juice Shop nhằm phục vụ hoạt
+    động bán hàng trực tuyến. Trước khi đưa hệ thống vào vận hành chính thức, đội ngũ phát triển lo ngại rằng một
+    số chức năng của ứng dụng chưa kiểm tra và xử lý an toàn dữ liệu do người dùng cung cấp, có thể dẫn đến lỗ hổng
+    Cross-Site Scripting (XSS). Sinh viên đóng vai trò một Chuyên gia kiểm thử xâm nhập (Penetration Tester), được
+    giao nhiệm vụ xác định các vị trí đầu vào có nguy cơ tồn tại XSS trên ứng dụng.
+
+    <p><strong>Vai trò của sinh viên:</strong></p>
+    <ul>
+      <li>Sử dụng OWASP ZAP để quan sát HTTP Request/Response và cảnh báo bảo mật, xác định vị trí tiếp nhận dữ
+        liệu có khả năng tồn tại XSS.</li>
+      <li>Kiểm thử Reflected XSS trên các trường dữ liệu phản hồi trực tiếp về trình duyệt.</li>
+      <li>Chặn và chỉnh sửa HTTP Request bằng OWASP ZAP để kiểm thử Stored XSS thông qua chức năng đăng ký người
+        dùng và tải tệp.</li>
+      <li>Sử dụng curl để gửi Request trực tiếp tới REST API, kiểm tra khả năng chèn mã độc vào dữ liệu sản phẩm mà
+        không cần thao tác qua giao diện.</li>
+      <li>Tổng hợp kết quả kiểm thử bằng báo cáo OWASP ZAP và đối chiếu với nhật ký máy chủ.</li>
+    </ul>
+
+    <h3>Sơ đồ mạng</h3>
+    <div class="topology">
+      <div class="topo-diagram">
+        <div class="topo-node">
+          <div>Máy trạm sinh viên</div>
+          <div class="node-label">Firefox + OWASP ZAP</div>
+          <div class="node-ip">192.168.99.101</div>
+        </div>
+
+        <div class="topo-arrow">
+          <div class="arrow-label">HTTP/HTTPS qua Proxy 127.0.0.1:8080</div>
+          <div class="arrow-line"></div>
+          <div style="font-size: 9pt; color: #555;">cổng 3000</div>
+        </div>
+
+        <div class="topo-node">
+          <div>Máy chủ web</div>
+          <div class="node-label">OWASP Juice Shop</div>
+          <div class="node-ip">192.168.99.100</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>Cross-Site Scripting (XSS)</h3>
+    <p>XSS là lỗ hổng xảy ra khi ứng dụng tiếp nhận và hiển thị dữ liệu đầu vào của người dùng mà không kiểm tra,
+      lọc hoặc mã hóa đầu ra phù hợp, khiến mã độc có thể được thực thi trên trình duyệt nạn nhân. Trong bài lab
+      này, sinh viên tập trung vào hai dạng chính. <strong>Reflected XSS</strong> là dạng mà payload được phản hồi
+      ngay trong một request/response duy nhất mà không được lưu trữ. <strong>Stored (Persisted) XSS</strong> là
+      dạng mà payload được lưu vào cơ sở dữ liệu và thực thi lại mỗi khi dữ liệu đó được hiển thị cho người dùng
+      khác.</p>
+
+    <h3>OWASP ZAP, Web Proxy và REST API</h3>
+    <p>Sinh viên sử dụng các chức năng <code>Sites</code>, <code>History</code>, <code>Alerts</code> và
+      <code>Break/Intercept</code> của OWASP ZAP để theo dõi, phân tích và chỉnh sửa lưu lượng HTTP giữa trình
+      duyệt và máy chủ khi Firefox được cấu hình sử dụng ZAP làm proxy. Ngoài kiểm thử qua giao diện Web, bài lab
+      còn yêu cầu tương tác trực tiếp với REST API của ứng dụng bằng <code>curl</code> để kiểm tra các phương thức
+      HTTP được hỗ trợ và khả năng chỉnh sửa dữ liệu sản phẩm mà không cần đi qua Front-End.</p>
+
+    <table>
+      <tr>
+        <th style="width: 200px;">Công cụ / Chức năng</th>
+        <th>Mô tả tác dụng</th>
+      </tr>
+      <tr>
+        <td><code>Sites</code> / <code>History</code></td>
+        <td>Liệt kê các trang và request đã ghi nhận được trong quá trình điều hướng ứng dụng qua proxy.</td>
+      </tr>
+      <tr>
+        <td><code>Alerts</code></td>
+        <td>Hiển thị các cảnh báo bảo mật do ZAP tự động phát hiện, bao gồm cảnh báo liên quan đến XSS.</td>
+      </tr>
+      <tr>
+        <td><code>Break/Intercept</code></td>
+        <td>Chặn HTTP Request trước khi gửi tới máy chủ để chỉnh sửa nội dung, dùng để chèn payload XSS.</td>
+      </tr>
+      <tr>
+        <td><code>curl</code></td>
+        <td>Công cụ dòng lệnh dùng để gửi HTTP Request trực tiếp tới REST API, phục vụ khai thác không qua
+          Front-End.</td>
+      </tr>
+    </table>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+    <div class="box box-info">
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
+      <code>labtainer web-xss</code>
+    </div>
+
+    <h3>Tài khoản được cấu hình sẵn</h3>
+    <table>
+      <tr>
+        <th>Tên tài khoản</th>
+        <th style="width: 160px;">Mật khẩu</th>
+        <th>Hệ thống</th>
+      </tr>
+      <tr>
+        <td><code>admin@juice.org</code></td>
+        <td><code>admin123</code></td>
+        <td>Admin for web login</td>
+      </tr>
+      <tr>
+        <td><code>jim@juice.org</code></td>
+        <td><code>ncc-1701</code></td>
+        <td>web login</td>
+      </tr>
+      <tr>
+        <td><code>Ubuntu</code></td>
+        <td><code>ubuntu</code></td>
+        <td>Student workstation, vulnerable server, Attacker workstation</td>
+      </tr>
+    </table>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 - Xác nhận kết nối giữa máy trạm của sinh viên và máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên, sử dụng lệnh <code>ping</code> để xác
+          nhận kết nối tới máy chủ web:</p>
+        <pre><span class="cmd">ping 192.168.99.100</span></pre>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Nhận được phản hồi từ địa chỉ <code>192.168.99.100</code>,
+          xác nhận máy trạm và máy chủ web có thể liên lạc được với nhau.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 - Mở Firefox và truy cập vào máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên, gõ lệnh sau để mở trình duyệt Firefox:</p>
+        <pre><span class="cmd">firefox &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Trên Firefox, truy cập đường dẫn của ứng dụng web:</p>
+        <div class="box box-info">
+          <code>http://192.168.99.100:3000</code>
+        </div>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Truy cập thành công giao diện của ứng dụng OWASP Juice
+          Shop trên Firefox.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 - Khởi động và cấu hình OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên, khởi động OWASP ZAP:</p>
+        <pre><span class="cmd">owasp-zap &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Khi OWASP ZAP mở lên và yêu cầu nhập thông tin, sinh viên chọn "yes, I want to
+          persist this session with the name based on the current timestamp" rồi chọn <strong>Start</strong>.</p>
+
+        <p><strong>Bước 3:</strong> Nếu xuất hiện hộp thoại "Manage Add-on", sinh viên chọn <strong>Close</strong>
+          để tiếp tục.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> OWASP ZAP khởi động thành công và sẵn sàng để cấu hình
+          làm proxy.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 4 - Cấu hình Firefox Proxy để sử dụng OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Cấu hình OWASP ZAP làm proxy trung gian để bắt và phân tích lưu lượng
+          HTTP/HTTPS truyền từ trình duyệt Firefox trên máy trạm của sinh viên. Thực hiện theo các bước sau:</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox của máy sinh viên, mở <strong>Preferences</strong>.</p>
+        <p><strong>Bước 2:</strong> Trong ô tìm kiếm cài đặt, gõ <code>proxy</code>.</p>
+        <p><strong>Bước 3:</strong> Trong mục <strong>Network Proxy</strong>, chọn <strong>Settings</strong>.</p>
+        <p><strong>Bước 4:</strong> Chọn <strong>Manual proxy configuration</strong> (Cấu hình proxy thủ công).</p>
+        <p><strong>Bước 5:</strong> Tại trường HTTP Proxy, nhập <code>127.0.0.1</code>, Port nhập <code>8080</code>.
+        </p>
+        <p><strong>Bước 6:</strong> Chọn thêm <strong>Use this proxy server for all protocols</strong> (Sử dụng máy
+          chủ proxy này cho tất cả các giao thức).</p>
+        <p><strong>Bước 7:</strong> Chọn <strong>OK</strong> để chấp nhận các cài đặt.</p>
+
+        <p>Sau khi cấu hình xong, thực hiện các bước sau để xác nhận Firefox đang sử dụng ZAP làm proxy:</p>
+        <p><strong>Bước 8:</strong> Làm mới trang web <code>192.168.99.100:3000</code>. Một cảnh báo bảo mật với
+          thông báo "Kết nối của bạn không an toàn" sẽ xuất hiện do chứng chỉ SSL của ZAP chưa được tin cậy.</p>
+        <p><strong>Bước 9:</strong> Chọn <strong>Advanced</strong> để xem chi tiết chứng chỉ (thường hiển thị lỗi
+          <code>SEC_ERROR_UNKNOWN_ISSUER</code>), sau đó chọn <strong>Add Exception</strong> để chấp nhận chứng chỉ
+          này.
+        </p>
+        <p><strong>Bước 10:</strong> Tại cửa sổ xác nhận, sinh viên chọn <strong>Confirm Security Exception</strong>
+          để hoàn tất.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Firefox truy cập được ứng dụng web qua proxy của OWASP
+          ZAP, tab <strong>History</strong> trong ZAP bắt đầu ghi nhận các request.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 5 - Kiểm tra lỗ hổng trang web bằng OWASP ZAP</div>
+      <div class="task-body">
+        <p>Trong quá trình điều hướng qua các chức năng của ứng dụng (tìm kiếm sản phẩm, đăng ký, đăng nhập, gửi
+          khiếu nại...), OWASP ZAP sẽ tự động quét và ghi nhận lưu lượng đi qua proxy. Thực hiện các bước sau để
+          xác định các cảnh báo XSS mà ZAP đã phát hiện.</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox, điều hướng qua các chức năng chính của ứng dụng (trang tìm kiếm
+          sản phẩm, trang đăng ký, trang đăng nhập) để ZAP ghi nhận lưu lượng vào tab <strong>History</strong>.</p>
+
+        <p><strong>Bước 2:</strong> Trong OWASP ZAP, chuyển sang tab <strong>Alerts</strong> ở khung phía dưới.</p>
+
+        <p><strong>Bước 3:</strong> Trong danh sách cảnh báo, tìm các mục có tên liên quan đến
+          <strong>Cross Site Scripting</strong>. Nhấp vào từng cảnh báo để xem chi tiết URL, tham số đầu vào và
+          request/response tương ứng ở khung bên phải.
+        </p>
+
+        <p><strong>Bước 4:</strong> Ghi lại các URL và tham số đầu vào được ZAP cảnh báo, đây sẽ là các vị trí ưu
+          tiên kiểm thử thủ công ở các nhiệm vụ tiếp theo.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định được ít nhất một cảnh báo liên quan đến XSS
+          trong tab Alerts, kèm theo URL và tham số đầu vào tương ứng.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong><br />
+          Vì sao một cảnh báo XSS chỉ xuất hiện trong tab Alerts sau khi sinh viên đã điều hướng qua trang chứa lỗ
+          hổng đó? Điều này nói lên điều gì về cơ chế quét thụ động của OWASP ZAP?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 6 - Xác minh đầu vào dữ liệu cho Reflected XSS</div>
+      <div class="task-body">
+        <p>Reflected XSS xảy ra khi ứng dụng trả về trực tiếp dữ liệu đầu vào chưa qua kiểm tra trong response,
+          thường được gọi là XSS phiên không hoặc first-order do payload chỉ cần một request/response duy nhất để
+          thực thi. Vì trình duyệt có thể tự động chặn thẻ <code>&lt;script&gt;</code>, sinh viên cần thử lần lượt
+          cả ba dạng payload dưới đây trên các trường dữ liệu đầu vào của ứng dụng (ví dụ ô tìm kiếm sản phẩm).</p>
+
+        <p><strong>Payload 1 - JavaScript thuần:</strong></p>
+        <div class="box box-info">
+          <code>&lt;script&gt;alert(1);&lt;/script&gt;</code>
+        </div>
+
+        <p><strong>Payload 2 - Malformed IMG tag:</strong></p>
+        <div class="box box-info">
+          <code>&lt;IMG """&gt;&lt;SCRIPT&gt;alert("XSS")&lt;/SCRIPT&gt;"\&gt;</code>
+        </div>
+
+        <p><strong>Payload 3 - Sự kiện onerror không dùng thẻ script:</strong></p>
+        <div class="box box-info">
+          <code>&lt;IMG SRC=/ onerror="alert(String.fromCharCode(88,83,83))"&gt;&lt;/img&gt;</code>
+        </div>
+
+        <p><strong>Bước 1:</strong> Nhập lần lượt từng payload vào ô tìm kiếm sản phẩm trên giao diện Juice Shop và
+          quan sát phản hồi trả về.</p>
+        <p><strong>Bước 2:</strong> Ghi nhận payload nào thực thi được và payload nào bị chặn để xác định cơ chế
+          lọc dữ liệu đầu vào của ứng dụng.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Kích hoạt thành công cảnh báo (alert) trên trình duyệt
+          với ít nhất một trong ba payload trên.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong><br />
+          Vì sao cần thử cả ba dạng payload thay vì chỉ dùng một payload duy nhất để kiểm thử Reflected XSS? Nêu ví
+          dụ một payload có thể bị chặn trong khi payload khác lại không.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 7 - Kiểm thử Stored XSS</div>
+      <div class="task-body">
+        <p>Stored XSS xảy ra khi ứng dụng lưu trữ dữ liệu đầu vào độc hại vào cơ sở dữ liệu và thực thi lại mỗi khi
+          dữ liệu đó được hiển thị cho người dùng khác, do đó còn được gọi là second-order XSS. Nhiệm vụ này gồm
+          hai phần: chỉnh sửa một request đang truyền đi, và khai thác thông qua chức năng tải tệp.</p>
+
+        <p><strong>7.1 - Sửa đổi yêu cầu POST khi đăng ký người dùng</strong></p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox, chọn <strong>Account</strong> → <strong>Login</strong>, sau đó chọn
+          <strong>Not yet a customer?</strong> để chuyển tới trang đăng ký người dùng.
+        </p>
+
+        <p><strong>Bước 2:</strong> Điền thông tin đăng ký như sau nhưng <strong>chưa</strong> nhấn
+          <strong>Register</strong>:
+        </p>
+        <div class="box box-info">
+          Email: <code>test@noemail.com</code><br />
+          Password: <code>Password#1</code><br />
+          Repeat Password: <code>Password#1</code><br />
+          Security Question: Name of your favorite Pet? Answer: <code>Dogs</code>
+        </div>
+
+        <p><strong>Bước 3:</strong> Trong OWASP ZAP, bật chế độ <strong>Break</strong> để chặn request trước khi gửi
+          đi.</p>
+
+        <p><strong>Bước 4:</strong> Quay lại Firefox và nhấn <strong>Register</strong>. Request sẽ bị OWASP ZAP giữ
+          lại trong tab <strong>Break</strong>.</p>
+
+        <p><strong>Bước 5:</strong> Trong phần thân của request, thay thế giá trị email:</p>
+        <div class="box box-info">
+          Thay: <code>test@noemail.com</code><br />
+          Bằng: <code>&lt;script&gt;alert("XSS")&lt;/script&gt;</code>
+        </div>
+
+        <p><strong>Bước 6:</strong> Chọn <strong>Submit and continue to the next break point</strong> để hoàn tất
+          gửi request đăng ký.</p>
+
+        <p><strong>Bước 7:</strong> Đăng nhập bằng tài khoản quản trị đã được cấp và truy cập trang
+          <code>https://192.168.99.100:3000/#/administration</code> để kiểm tra payload có được thực thi hay
+          không.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ 7.1:</strong> Tạo thành công một tài khoản có email chứa payload
+          XSS và payload được thực thi khi tài khoản quản trị xem trang Administration.
+        </div>
+
+        <p><strong>7.2 - Khai thác Stored XSS qua chức năng tải tệp</strong></p>
+
+        <p><strong>Bước 1:</strong> Đăng nhập bằng một tài khoản người dùng bất kỳ, chọn menu ba dòng ở góc phải,
+          chọn <strong>Complaint</strong>.</p>
+
+        <p><strong>Bước 2:</strong> Trong biểu mẫu khiếu nại, nhập nội dung tin nhắn và tải lên tệp
+          <code>testfile.pdf</code>, nhưng <strong>chưa</strong> gửi.
+        </p>
+
+        <p><strong>Bước 3:</strong> Trong OWASP ZAP, bật chế độ <strong>Break</strong>, sau đó quay lại Firefox và
+          nhấn <strong>Submit</strong>. Request sẽ bị ZAP giữ lại.</p>
+
+        <p><strong>Bước 4:</strong> Trong OWASP ZAP, quan sát nội dung request đang bị chặn, sau đó chọn
+          <strong>Submit and continue to the next break point</strong> để gửi tiếp.
+        </p>
+
+        <p><strong>Bước 5:</strong> Lặp lại các bước trên, thay tệp <code>testfile.pdf</code> bằng
+          <code>testfile.xml</code> và so sánh cách ứng dụng xử lý hai loại tệp.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ 7.2:</strong> Gửi thành công cả hai khiếu nại kèm tệp đính kèm và
+          quan sát được nội dung request tương ứng trong OWASP ZAP.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong><br />
+          So sánh mức độ nguy hiểm giữa Reflected XSS ở Nhiệm vụ 6 và Stored XSS ở Nhiệm vụ 7.1. Vì sao Stored XSS
+          thường được đánh giá là nghiêm trọng hơn?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 8 - Khai thác XSS qua REST API bằng curl</div>
+      <div class="task-body">
+        <p>Nhiệm vụ này thực hiện tấn công XSS mà không cần truy cập giao diện Front-End, thông qua việc gửi
+          request trực tiếp tới REST API bằng curl.</p>
+
+        <p><strong>Bước 1:</strong> Truy cập <code>https://192.168.99.100:3000/api/Products/</code> để lấy danh
+          sách ID sản phẩm. Ghi nhận sản phẩm <strong>Orange Juice</strong> có ID <code>2</code>.</p>
+
+        <p><strong>Bước 2:</strong> Tại giao diện dòng lệnh máy sinh viên, kiểm tra các phương thức HTTP được hỗ
+          trợ cho sản phẩm ID 2:</p>
+        <pre><span class="cmd">curl -X OPTIONS -D- 'http://192.168.99.100:3000/api/Products/2'</span></pre>
+
+        <p><strong>Bước 3:</strong> Quan sát header <code>Access-Control-Allow-Methods</code> trong phản hồi. Nếu
+          phương thức <code>PUT</code> được hỗ trợ, sinh viên có thể cập nhật dữ liệu sản phẩm trực tiếp qua API.
+        </p>
+
+        <p><strong>Bước 4:</strong> Gửi request PUT để cập nhật mô tả sản phẩm với payload XSS:</p>
+        <pre><span class="cmd">curl -X PUT "http://192.168.99.100:3000/api/Products/2" -H "Content-Type: application/json" --data-binary '{"description":"&lt;iframe src=\"javascript:alert(`xss`)\"&gt;"}'</span></pre>
+
+        <p><strong>Bước 5:</strong> Truy cập lại <code>https://192.168.99.100:3000/api/Products/</code> hoặc xem
+          chi tiết sản phẩm trên giao diện Web để kiểm tra mô tả đã bị thay đổi và payload có được thực thi hay
+          không.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Cập nhật thành công trường mô tả sản phẩm ID 2 bằng
+          payload <code>&lt;iframe src="javascript:alert(`xss`)"&gt;</code> thông qua curl.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 9 - Khai thác XSS qua REST API bằng curl</div>
+      <div class="task-body">
+        <p>Áp dụng kỹ thuật tương tự Nhiệm vụ 8, sinh viên thực hiện chỉnh sửa trường giá của sản phẩm ID
+          <code>6</code> để kích hoạt cảnh báo XSS khi trường giá được hiển thị trên giao diện.
+        </p>
+
+        <p><strong>Bước 1:</strong> Từ giao diện dòng lệnh máy sinh viên, gửi request PUT để chỉnh sửa giá sản phẩm
+          ID 6, sử dụng payload JavaScript tương tự Nhiệm vụ 6 (ví dụ
+          <code>&lt;script&gt;alert(1);&lt;/script&gt;</code>) thay cho giá trị số.
+        </p>
+
+        <p><strong>Bước 2:</strong> Truy cập trang xem chi tiết sản phẩm ID 6 trên giao diện Web và quan sát cảnh
+          báo (alert) có xuất hiện khi giá sản phẩm được hiển thị hay không.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Kích hoạt thành công cảnh báo XSS khi trường giá của sản
+          phẩm ID 6 được hiển thị trên giao diện.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 4:</strong><br />
+          Vì sao việc khai thác XSS qua REST API bằng curl ở Nhiệm vụ 8 và 9 lại nguy hiểm hơn so với khai thác qua
+          giao diện Front-End, xét trên góc độ kiểm soát đầu vào của ứng dụng?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 10 - Tổng hợp báo cáo và xem lại nhật ký</div>
+      <div class="task-body">
+        <p><strong>10.1 - Tạo report từ OWASP ZAP</strong></p>
+
+        <p><strong>Bước 1:</strong> Trong OWASP ZAP, vào menu <strong>Report</strong>, chọn
+          <strong>Generate Report</strong>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Chọn định dạng HTML, lưu báo cáo vào thư mục chính của máy sinh viên với tên
+          tệp <code>report_zap</code>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ 10.1:</strong> Tệp báo cáo <code>report_zap</code> được tạo thành
+          công và chứa các cảnh báo XSS đã phát hiện trong quá trình thực hành.
+        </div>
+
+        <p><strong>10.2 - Xem lại nhật ký máy chủ</strong></p>
+
+        <p><strong>Bước 1:</strong> Trên màn hình dòng lệnh của máy chủ web, nhập lệnh sau để xem nhật ký dịch vụ:
+        </p>
+        <pre><span class="cmd">sudo journalctl -u juice-shop</span></pre>
+
+        <p><strong>Bước 2:</strong> Sử dụng phím space để cuộn xuống, quan sát và ghi lại các sự kiện đáng chú ý
+          liên quan đến các payload đã khai thác trong bài thực hành.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ 10.2:</strong> Xác định được các sự kiện trong nhật ký máy chủ
+          tương ứng với các lần khai thác XSS đã thực hiện.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 5:</strong><br />
+          Dựa trên báo cáo OWASP ZAP và nhật ký máy chủ, nêu ít nhất hai biện pháp phòng chống XSS mà đội ngũ phát
+          triển ứng dụng cần triển khai.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+    </div>
+
+  </div>
+</body>
+
+</html>

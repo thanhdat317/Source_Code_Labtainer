@@ -1,0 +1,8 @@
+#!/bin/bash
+outpath=/home/ubuntu/.local/result
+mkdir -p "$outpath"
+if [ -f "/home/ubuntu/report_zap.html" ] || [ -f "/home/ubuntu/report_zap" ] || [ -f "/home/ubuntu/Desktop/report_zap.html" ] || [ -f "/home/ubuntu/Desktop/report_zap" ]; then
+   echo "zap_report_created" > "$outpath/zap_report.txt"
+else
+   echo "zap_report_missing" > "$outpath/zap_report.txt"
+fi
