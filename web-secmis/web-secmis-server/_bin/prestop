@@ -1,0 +1,5 @@
+#!/bin/bash
+# Dump journalctl for juice-shop service before the container stops
+outpath=/home/ubuntu/.local/result
+mkdir -p "$outpath"
+sudo journalctl -u juice-shop --no-pager > "$outpath/journalctl.stdout"
