@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành - Web-Insides</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-easy {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .badge-network {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .badge-protocol {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 12pt;
+      color: #2e4053;
+      margin: 16px 0 6px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd {
+      color: #89dceb;
+    }
+
+    pre .comment {
+      color: #8b93a8;
+      font-style: italic;
+    }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .box strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .topo-node .node-label {
+      font-size: 10pt;
+      opacity: 0.9;
+    }
+
+    .topo-node .node-ip {
+      font-size: 9pt;
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 20px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .topo-arrow .arrow-line {
+      width: 120px;
+      height: 2px;
+      background: #27ae60;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body {
+      padding: 14px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+
+    .task-group {
+      margin: 18px 0;
+    }
+
+    .task-group-title {
+      font-size: 12.5pt;
+      color: #003087;
+      font-weight: bold;
+      padding: 8px 0 4px 4px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">Insecure Deserialization - Khai thác lỗ hổng Deserialization, RCE và SSTI</div>
+      <div class="meta">
+        <span class="badge badge-protocol">Mức độ: Trung bình</span>
+        <span class="badge badge-network">An toàn ứng dụng Web</span>
+        <span class="badge badge-easy">Kiểm thử xâm nhập</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+
+    <table>
+      <tr>
+        <th style="width: 220px;">Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td><strong>Tên Lab</strong></td>
+        <td><code>web-insdes</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mức độ</strong></td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td><strong>Công cụ sử dụng</strong></td>
+        <td><code>OWASP ZAP</code>, <code>Firefox</code>, <code>Swagger API</code>, <code>Terminal (Linux)</code>
+        </td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <p>Bài thực hành nhằm rèn luyện kỹ năng khai thác lỗ hổng Insecure Deserialization trên ứng dụng web. Thông
+      qua bài lab, sinh viên sử dụng OWASP ZAP để chặn bắt và chỉnh sửa các yêu cầu POST định dạng JSON gửi tới
+      API B2B của ứng dụng, từ đó buộc máy chủ thực thi các đoạn mã ngoài ý muốn, gây từ chối dịch vụ (DoS) và
+      cuối cùng khai thác lỗ hổng Server-Side Template Injection (SSTI) trên trang hồ sơ người dùng.</p>
+    <ul>
+      <li>Sử dụng <strong>OWASP ZAP</strong> và <strong>Swagger API</strong> để khảo sát và thao tác trực tiếp với
+        API B2B của ứng dụng.</li>
+      <li>Khai thác lỗ hổng <strong>Insecure Deserialization</strong> để buộc máy chủ thực thi mã JavaScript tùy
+        ý thông qua trường dữ liệu JSON.</li>
+      <li>Gây từ chối dịch vụ (DoS) bằng kỹ thuật <strong>ReDoS</strong> (Regular Expression Denial of Service).
+      </li>
+      <li>Khai thác lỗ hổng <strong>Server-Side Template Injection (SSTI)</strong> trên trang hồ sơ người dùng để
+        đọc dữ liệu nhạy cảm trên máy chủ.</li>
+    </ul>
+
+    <h3>Kỹ năng đạt được</h3>
+    <ul>
+      <li>Kỹ năng sử dụng OWASP ZAP kết hợp Swagger UI để phân tích và chỉnh sửa trực tiếp HTTP Request dạng
+        JSON.</li>
+      <li>Kỹ năng nhận diện và khai thác lỗ hổng Insecure Deserialization dẫn đến thực thi mã từ xa (RCE).</li>
+      <li>Kỹ năng nhận diện Template Engine của ứng dụng và khai thác lỗ hổng SSTI.</li>
+      <li>Kỹ năng đánh giá rủi ro và đề xuất biện pháp khắc phục cho các lỗ hổng thuộc nhóm Insecure
+        Deserialization và Injection.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+
+    <strong>Tình huống:</strong><br />
+    Ứng dụng thương mại điện tử OWASP Juice Shop cung cấp một API B2B cho phép đối tác gửi đơn hàng dưới định
+    dạng JSON. Đội ngũ phát triển lo ngại rằng cơ chế xử lý dữ liệu đầu vào tại API này chưa được kiểm soát chặt
+    chẽ, có thể cho phép kẻ tấn công chèn mã thực thi tùy ý thông qua quá trình deserialization. Bên cạnh đó,
+    trang hồ sơ người dùng được xây dựng bằng một Template Engine cũng tiềm ẩn nguy cơ bị khai thác SSTI. Sinh
+    viên đóng vai trò một Chuyên gia đánh giá bảo mật (Security Auditor), được cấp quyền truy cập như người dùng
+    thông thường và cần xác minh, khai thác các lỗ hổng nêu trên để đánh giá mức độ rủi ro của hệ thống.
+
+    <p><strong>Vai trò của sinh viên:</strong></p>
+    <ul>
+      <li>Dùng OWASP ZAP làm proxy trung gian để chặn bắt lưu lượng HTTP/HTTPS giữa Firefox và máy chủ mục
+        tiêu.</li>
+      <li>Thao tác trực tiếp với API B2B qua Swagger UI để khai thác lỗ hổng Insecure Deserialization, gây thực
+        thi mã và từ chối dịch vụ trên máy chủ.</li>
+      <li>Khai thác lỗ hổng SSTI trên trang hồ sơ người dùng để đọc dữ liệu nhạy cảm được lưu trữ trên máy chủ.
+      </li>
+    </ul>
+
+    <h3>Sơ đồ mạng</h3>
+    <div class="topology">
+      <div class="topo-diagram">
+        <div class="topo-node">
+          <div>Máy trạm sinh viên</div>
+          <div class="node-label">Firefox + OWASP ZAP</div>
+          <div class="node-ip">192.168.99.101</div>
+        </div>
+
+        <div class="topo-arrow">
+          <div class="arrow-label">HTTP/HTTPS qua Proxy 127.0.0.1:8080</div>
+          <div class="arrow-line"></div>
+          <div style="font-size: 9pt; color: #555;">cổng 3000</div>
+        </div>
+
+        <div class="topo-node">
+          <div>Máy chủ web</div>
+          <div class="node-label">OWASP Juice Shop</div>
+          <div class="node-ip">192.168.99.100</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>Insecure Deserialization</h3>
+    <p>Insecure Deserialization xảy ra khi ứng dụng khôi phục (deserialize) dữ liệu từ một chuỗi JSON hoặc XML mà
+      không kiểm tra kỹ nội dung bên trong, dẫn đến việc các đoạn mã hoặc lệnh gọi hàm được nhúng trong dữ liệu
+      đó bị máy chủ thực thi. Trong bài lab này, API B2B của Juice Shop nhận trường <code>orderLinesData</code>
+      dưới dạng chuỗi và thực thi trực tiếp nội dung bên trong như một biểu thức JavaScript, cho phép sinh viên
+      kiểm chứng lỗ hổng bằng cách gửi các payload gây vòng lặp vô hạn hoặc biểu thức chính quy tốn tài nguyên
+      (ReDoS).</p>
+
+    <h3>Server-Side Template Injection (SSTI)</h3>
+    <p>SSTI xảy ra khi dữ liệu người dùng nhập vào được Template Engine (ở đây là Pug) xử lý như một biểu thức
+      thay vì một chuỗi văn bản thông thường. Nếu ứng dụng không phân tách rõ dữ liệu và mã lệnh, kẻ tấn công có
+      thể chèn biểu thức Pug để buộc máy chủ thực thi mã JavaScript tùy ý, từ đó đọc file hệ thống hoặc chiếm
+      quyền điều khiển máy chủ.</p>
+
+    <h3>Công cụ sử dụng trong bài</h3>
+    <table>
+      <tr>
+        <th style="width: 200px;">Công cụ / Chức năng</th>
+        <th>Mô tả tác dụng</th>
+      </tr>
+      <tr>
+        <td><code>Spider</code> (OWASP ZAP)</td>
+        <td>Tự động thu thập URL, tài nguyên của ứng dụng để phát hiện các endpoint không hiển thị trực tiếp
+          trên giao diện, ví dụ tài liệu Swagger API.</td>
+      </tr>
+      <tr>
+        <td><code>Swagger UI</code></td>
+        <td>Giao diện trực quan để xem tài liệu và gửi trực tiếp các yêu cầu tới API B2B, phục vụ chỉnh sửa
+          Request Body dạng JSON.</td>
+      </tr>
+      <tr>
+        <td><code>Pug Template Engine</code></td>
+        <td>Template Engine dựng trang hồ sơ người dùng của Juice Shop, là vị trí tồn tại lỗ hổng SSTI được khai
+          thác trong bài lab.</td>
+      </tr>
+    </table>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+    <div class="box box-info">
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
+      <code>labtainer web-insdes</code>
+    </div>
+
+    <h3>Tài khoản được cấu hình sẵn</h3>
+    <table>
+      <tr>
+        <th>Username</th>
+        <th style="width: 160px;">Password</th>
+        <th>Hệ thống</th>
+      </tr>
+      <tr>
+        <td><code>admin@juice.org</code></td>
+        <td><code>admin123</code></td>
+        <td>Tài khoản quản trị để đăng nhập web</td>
+      </tr>
+      <tr>
+        <td><code>jim@juice.org</code></td>
+        <td><code>ncc-1701</code></td>
+        <td>Đăng nhập web</td>
+      </tr>
+      <tr>
+        <td><code>Ubuntu</code></td>
+        <td><code>ubuntu</code></td>
+        <td>Máy trạm sinh viên</td>
+      </tr>
+      <tr>
+        <td><code>Ubuntu</code></td>
+        <td><code>ubuntu</code></td>
+        <td>Máy chủ chứa lỗ hổng</td>
+      </tr>
+    </table>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 - Kiểm tra kết nối giữa máy trạm của sinh viên và máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên (web-insdes), sử dụng lệnh
+          <code>ping</code> để xác nhận kết nối tới máy chủ web:
+        </p>
+        <pre><span class="cmd">ping 192.168.99.100</span></pre>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Nhận được phản hồi từ địa chỉ
+          <code>192.168.99.100</code>, xác nhận máy trạm và máy chủ web có thể liên lạc được với nhau.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 - Mở Firefox và truy cập vào máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên, gõ lệnh sau để mở trình duyệt
+          Firefox:</p>
+        <pre><span class="cmd">firefox &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Trên Firefox, truy cập đường dẫn của ứng dụng web:</p>
+        <div class="box box-info">
+          <code>http://192.168.99.100:3000</code>
+        </div>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Truy cập thành công giao diện của ứng dụng OWASP Juice
+          Shop trên Firefox.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 - Khởi động và cài đặt OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh, khởi động OWASP ZAP:</p>
+        <pre><span class="cmd">owasp-zap &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Khi OWASP ZAP mở lên và yêu cầu nhập thông tin, sinh viên chọn "yes, I want
+          to persist this session with the name based on the current timestamp" rồi chọn <strong>Start</strong>.
+        </p>
+
+        <p><strong>Bước 3:</strong> Nếu xuất hiện hộp thoại "Manage Add-on", sinh viên chọn
+          <strong>Close</strong> để tiếp tục.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> OWASP ZAP khởi động thành công và sẵn sàng để cấu hình
+          làm proxy.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 4 - Cấu hình Firefox Proxy để sử dụng OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Cấu hình OWASP ZAP làm proxy trung gian để bắt và phân tích các gói tin
+          HTTP/HTTPS truyền từ trình duyệt Firefox trên máy trạm của sinh viên. Thực hiện cấu hình trên trình
+          duyệt Firefox theo các bước sau đây:</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox của máy tính sinh viên, mở <strong>Preferences</strong>.</p>
+        <p><strong>Bước 2:</strong> Trong ô tìm kiếm cài đặt, gõ <code>proxy</code>.</p>
+        <p><strong>Bước 3:</strong> Trong mục <strong>Network Proxy</strong>, chọn <strong>Settings</strong>.
+        </p>
+        <p><strong>Bước 4:</strong> Chọn <strong>Manual proxy configuration</strong> (Cấu hình proxy thủ công).
+        </p>
+        <p><strong>Bước 5:</strong> Tại trường HTTP Proxy, nhập <code>127.0.0.1</code>, Port nhập
+          <code>8080</code>.
+        </p>
+        <p><strong>Bước 6:</strong> Chọn thêm <strong>Use this proxy server for all protocols</strong> (Sử dụng
+          máy chủ proxy này cho tất cả các giao thức).</p>
+        <p><strong>Bước 7:</strong> Chọn <strong>OK</strong> để chấp nhận các cài đặt.</p>
+
+        <p>Sau khi cấu hình xong, thực hiện các bước sau để xác nhận Firefox đang sử dụng ZAP làm proxy:</p>
+        <p><strong>Bước 8:</strong> Làm mới trang web <code>192.168.99.100:3000</code>. Một cảnh báo bảo mật với
+          thông báo "Kết nối của bạn không an toàn" sẽ xuất hiện.</p>
+        <p><strong>Bước 9:</strong> Sinh viên tiếp tục bấm chọn <strong>Advanced</strong> để xem chi tiết chứng
+          chỉ SSL (thường hiển thị lỗi <code>SEC_ERROR_UNKNOWN_ISSUER</code>), sau đó chọn <strong>Add
+            Exception</strong> để chấp nhận chứng chỉ này.</p>
+        <p><strong>Bước 10:</strong> Tại cửa sổ xác nhận, sinh viên tiếp tục bấm chọn <strong>Confirm Security
+            Exception</strong>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Firefox truy cập được ứng dụng web qua proxy của OWASP
+          ZAP, tab <strong>History</strong> trong ZAP bắt đầu ghi nhận các request.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 5 - Truy cập vào dữ liệu bị hạn chế</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Sử dụng công cụ Spider của OWASP ZAP để tự động thu thập các URL và tài
+          nguyên của ứng dụng, qua đó xác định những đường dẫn hoặc chức năng không được hiển thị trực tiếp trên
+          giao diện nhưng vẫn có thể được truy cập. Theo OWASP WSTG-ATHZ-01, việc lập danh sách các URL và thư
+          mục của ứng dụng là bước quan trọng trong quá trình kiểm thử, giúp phát hiện các endpoint nhạy cảm bị
+          lộ do cấu hình chưa phù hợp.</p>
+
+        <p><strong>Bước 1:</strong> Tại tab <strong>Sites</strong> của OWASP ZAP, chọn trang
+          <code>192.168.99.100:3000</code>, sau đó vào <strong>Attack</strong> → <strong>Spider</strong> để bắt
+          đầu quét.
+        </p>
+
+        <p><strong>Bước 2:</strong> Sau khi quét hoàn tất, quan sát danh sách đường dẫn được tìm thấy và trả lời
+          câu hỏi: sinh viên có thấy bất kỳ liên kết nào đến tài liệu API hoặc các thư mục ẩn không?</p>
+
+        <p><strong>Bước 3:</strong> Lưu kết quả quét dưới dạng báo cáo HTML, lưu tại Desktop với tên
+          <code>traversal.html</code>. Trường hợp không có tùy chọn Traversal, hãy lưu toàn bộ báo cáo.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định được các endpoint quan trọng (tài liệu
+          Swagger API, thư mục ftp) thông qua kết quả Spider và lưu được báo cáo quét.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong><br />
+          Sinh viên tìm thấy những đường dẫn đáng chú ý nào qua kết quả Spider, và vì sao các đường dẫn này
+          không nên bị lộ với người dùng thông thường?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 6 - Khai thác Insecure Deserialization để thực thi mã từ xa (RCE)</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Sinh viên tìm cách khiến máy chủ thực thi mã ngoài ý muốn bằng cách gửi dữ
+          liệu độc hại qua yêu cầu POST dạng JSON, theo tiêu chuẩn OWASP WSTG 4.7.11.2 để kiểm tra hai lỗ hổng
+          Remote File Inclusion và Code Inclusion. Nguyên nhân gốc rễ là ứng dụng không kiểm tra kỹ dữ liệu đầu
+          vào khi nạp tệp động, tạo cơ hội cho kẻ tấn công chèn mã độc và chiếm quyền điều khiển hệ thống.</p>
+
+        <p><strong>Bước 1:</strong> Mở trình duyệt và truy cập:
+          <code>https://192.168.99.100:3000/api-docs</code>. Đây là tài liệu mô tả các API của ứng dụng. Trong
+          danh sách API, sinh viên tìm đến: <strong>Order → POST /orders</strong>. Nhấp vào API này để xem chi
+          tiết.
+        </p>
+
+        <p><strong>Bước 2:</strong> Sinh viên nhấn <strong>Try it out</strong>,
+          không thay đổi nội dung mặc định và thực hiện nhấn <strong>Execute</strong>. Khi ấy máy chủ trả về
+          thông tin: <code>401 Unauthorized</code>. Điều này cho thấy API yêu cầu người dùng phải đăng nhập và
+          gửi kèm Bearer Token.</p>
+
+        <p><strong>Bước 3:</strong> Sinh viên thực hiện quay lại trang chính của ứng dụng web
+          và thực hiện đăng nhập bằng một tài khoản bất kì. Sau khi đăng nhập thành công, sinh viên vào OWASP
+          ZAP → <strong>History</strong> và tìm đến endpoint <code>rest/user/whoami</code>, sau đó sao chép
+          trường <code>Authorization</code>.</p>
+
+        <p><strong>Bước 4:</strong> Sinh viên quay lại trang web:
+          <code>https://192.168.99.100:3000/api-docs</code>. Sau đó thực hiện nhấn vào <strong>Authorize</strong>
+          và dán Bearer Token vừa sao chép. Tiếp theo chọn <strong>Post /orders → Try it out</strong> để kiểm
+          tra lại xem API sau xác thực đã thành công chưa.
+        </p>
+
+        <p><strong>Bước 5:</strong> Ứng dụng xử lý dữ liệu trong trường
+          <code>orderLinesData</code> không an toàn. Dẫn đến, nếu chuỗi JSON chứa một đoạn mã JavaScript, máy
+          chủ sẽ thực thi đoạn mã này trong quá trình xử lý. Trong phần Request Body, thay toàn bộ nội dung
+          bằng:
+        </p>
+        <div class="box box-info">
+          <code>{ "orderLinesData": "(function dos() { while(true); })()" }</code>
+        </div>
+        <p>Sau đó nhấn <strong>Execute</strong>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Máy chủ phản hồi <code>200 OK</code> sau khoảng thời
+          gian trễ, xác nhận payload gây vòng lặp vô hạn đã được thực thi thành công.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong><br />
+          Vì sao việc deserialize trực tiếp một chuỗi JSON thành mã JavaScript thực thi được lại là một lỗ hổng
+          nghiêm trọng? Đề xuất biện pháp phòng chống tương ứng.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+
+        <p><strong>6.2 - Gây từ chối dịch vụ bằng ReDoS</strong></p>
+
+        <p>Trong nhiệm vụ này, sinh viên sẽ tìm hiểu cách dữ liệu đầu vào không được kiểm tra an toàn có thể
+          khiến máy chủ thực thi một biểu thức chính quy (Regular Expression) nguy hiểm, đây là một dạng tấn
+          công có thể làm máy chủ tiêu tốn rất nhiều tài nguyên xử lý. Sinh viên tận dụng quá trình ở nhiệm vụ
+          trước và thực hiện thay Request Body thành:</p>
+        <div class="box box-info">
+          <code>{ "orderLinesData": "/((a+)+)b/.test('aaaaaaaaaaaaaaaaaaaaaaaaaaaaa')" }</code>
+        </div>
+        <p>Sau đó nhấn <strong>Execute</strong>.</p>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong><br />
+          Sau một khoảng thời gian đợi máy chủ xử lý, máy chủ sẽ phản hồi ra thông tin gì? Giải thích lý do?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 7 - Khai thác lỗ hổng SSTI để đọc dữ liệu nhạy cảm trên máy chủ</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Mục tiêu của nhiệm vụ này là tìm hiểu cách lỗ hổng Server-Side Template
+          Injection (SSTI) có thể bị khai thác để buộc máy chủ thực thi mã tùy ý. Trong bài thực hành này, sinh
+          viên sẽ xác minh sự tồn tại của lỗ hổng SSTI trên trang hồ sơ người dùng, sau đó sử dụng payload phù
+          hợp để hoàn thành thử thách.</p>
+
+        <p><strong>Bước 1:</strong> Sinh viên đăng nhập vào ứng dụng bằng một tài khoản
+          bất kỳ. Sau đó mở trang: <code>https://192.168.99.100:3000/profile</code>. Khi quan sát địa chỉ này,
+          có thể nhận thấy trang hồ sơ được xây dựng bằng Pug Template Engine, vì vậy đây là vị trí có khả năng
+          tồn tại lỗ hổng Server-Side Template Injection (SSTI).</p>
+
+        <p><strong>Bước 2:</strong> Sinh viên nhập tên người dùng:
+          <code>1+1</code>. Sau đó nhấn <strong>Set Username</strong>. Khi ấy, tên người
+          dùng sẽ được hiển thị đúng nguyên văn là: <code>1+1</code>. Điều này cho thấy dữ liệu đầu vào chưa
+          được xử lý như một biểu thức của Template Engine.
+        </p>
+
+        <p><strong>Bước 3:</strong> Sinh viên thay tên người dùng bằng:
+          <code>#{1+1}</code>. Sau đó nhấn <strong>Set Username</strong>. Khi ấy, tên người dùng sẽ hiển
+          thị là: <code>2</code>. Điều này chứng tỏ biểu thức trong Template đã được máy chủ thực thi và ứng
+          dụng tồn tại lỗ hổng Server-Side Template Injection (SSTI).
+        </p>
+
+        <p><strong>Bước 4:</strong> Trên máy chủ có giấu một tệp tin bí mật (<code>flag.txt</code>) mà sinh viên
+          cần tìm cách đọc được nội dung. Dựa trên nguyên lý tương tự Bước 3, sinh viên xây dựng một biểu thức
+          Pug lợi dụng đối tượng <code>global.process</code> của Node.js để gọi các hàm đọc file của hệ thống,
+          sau đó nhập biểu thức đó vào ô tên người dùng và nhấn <strong>Set Username</strong> để quan sát
+          nội dung tệp flag được trả về.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác minh thành công lỗ hổng SSTI trên trang hồ sơ và
+          đọc được nội dung tệp nhạy cảm trên máy chủ thông qua payload SSTI.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 4:</strong><br />
+          Vì sao trang hồ sơ sử dụng Pug Template Engine lại tồn tại lỗ hổng SSTI, và biện pháp nào giúp ngăn
+          chặn việc dữ liệu người dùng bị Template Engine thực thi như một biểu thức?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+    </div>
+
+  </div>
+</body>
+
+</html>

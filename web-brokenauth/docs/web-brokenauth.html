@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành - Web brokenauth</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-easy {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .badge-network {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .badge-protocol {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 12pt;
+      color: #2e4053;
+      margin: 16px 0 6px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd {
+      color: #89dceb;
+    }
+
+    pre .comment {
+      color: #8b93a8;
+      font-style: italic;
+    }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .box strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .topo-node .node-label {
+      font-size: 10pt;
+      opacity: 0.9;
+    }
+
+    .topo-node .node-ip {
+      font-size: 9pt;
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 20px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .topo-arrow .arrow-line {
+      width: 120px;
+      height: 2px;
+      background: #27ae60;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body {
+      padding: 14px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+
+    .task-group {
+      margin: 18px 0;
+    }
+
+    .task-group-title {
+      font-size: 12.5pt;
+      color: #003087;
+      font-weight: bold;
+      padding: 8px 0 4px 4px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">Broken Authentication - Khai thác lỗ hổng xác thực và quản lý phiên</div>
+      <div class="meta">
+        <span class="badge badge-protocol">Mức độ: Trung bình</span>
+        <span class="badge badge-network">An toàn ứng dụng Web</span>
+        <span class="badge badge-easy">Kiểm thử xâm nhập</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+
+    <table>
+      <tr>
+        <th style="width: 220px;">Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td><strong>Tên Lab</strong></td>
+        <td><code>web-brokenauth</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mức độ</strong></td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td><strong>Công cụ sử dụng</strong></td>
+        <td><code>OWASP ZAP</code>, <code>Firefox</code>, <code>JWT.io</code></td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <p>Bài thực hành nhằm giúp sinh viên tìm hiểu và thực hành khai thác các lỗ hổng Broken Authentication and
+      Session Management trên ứng dụng web. Thông qua bài lab, sinh viên sẽ làm quen với việc sử dụng OWASP ZAP để
+      phân tích cơ chế xác thực, kiểm tra session, token, chức năng đăng nhập, thay đổi mật khẩu và khôi phục mật
+      khẩu. Từ đó, sinh viên hiểu rõ hơn về các điểm yếu trong cơ chế xác thực và cách đánh giá mức độ an toàn của
+      ứng dụng web.</p>
+    <ul>
+      <li>Sử dụng <strong>OWASP ZAP</strong> để quét, thu thập URL và phát hiện tài nguyên/chức năng quản trị không
+        được công khai trên giao diện.</li>
+      <li>Phân tích Session Token, giải mã JWT để xác định thông tin nhạy cảm được lưu trữ bên trong.</li>
+      <li>Khai thác lỗ hổng <strong>SQL Injection</strong> để thu thập thông tin người dùng và mật khẩu đã băm.</li>
+      <li>Đánh giá mức độ an toàn của chức năng thay đổi mật khẩu và khôi phục mật khẩu (<strong>Forgot
+          Password</strong>).</li>
+    </ul>
+
+    <h3>Kỹ năng đạt được</h3>
+    <ul>
+      <li>Kỹ năng sử dụng OWASP ZAP: Spider, Sites, History, Alerts và Manual Request Editor để thu thập và phân
+        tích lưu lượng HTTP/HTTPS.</li>
+      <li>Kỹ năng phân tích và chỉnh sửa HTTP Request/Response, cấu trúc JSON Web Token (JWT).</li>
+      <li>Kỹ năng nhận diện và khai thác lỗ hổng SQL Injection phục vụ thu thập dữ liệu người dùng.</li>
+      <li>Kỹ năng đánh giá rủi ro và đề xuất biện pháp khắc phục cho các lỗ hổng thuộc nhóm Broken Authentication
+        and Session Management.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+
+    <strong>Tình huống:</strong><br />
+    Một doanh nghiệp phát triển website thương mại điện tử trên nền tảng OWASP Juice Shop. Dù đã triển khai đăng
+    nhập, quản lý phiên và các chức năng đổi/khôi phục mật khẩu, đội ngũ phát triển vẫn lo ngại ứng dụng còn tồn
+    tại lỗ hổng Broken Authentication and Session Management. Sinh viên đóng vai trò một Chuyên gia kiểm thử xâm
+    nhập (Penetration Tester), được cấp quyền truy cập như người dùng thông thường và cần xác định xem cơ chế xác
+    thực, quản lý phiên có cho phép chiếm quyền tài khoản hoặc truy cập trái phép hay không.
+
+    <p><strong>Vai trò của sinh viên:</strong></p>
+    <ul>
+      <li>Dùng OWASP ZAP để rà soát, chặn bắt và chỉnh sửa HTTP Request nhằm phân tích Session Token, JWT và cơ chế
+        xác thực của ứng dụng.</li>
+      <li>Khai thác SQL Injection để thu thập thông tin người dùng và mật khẩu đã băm, đánh giá mức độ an toàn của
+        cơ chế lưu trữ mật khẩu.</li>
+      <li>Kiểm thử chức năng đổi mật khẩu và Forgot Password để xác định khả năng thay đổi hoặc đặt lại mật khẩu
+        trái phép.</li>
+    </ul>
+
+    <h3>Sơ đồ mạng</h3>
+    <div class="topology">
+      <div class="topo-diagram">
+        <div class="topo-node">
+          <div>Máy trạm sinh viên</div>
+          <div class="node-label">Firefox + OWASP ZAP</div>
+          <div class="node-ip">192.168.99.101</div>
+        </div>
+
+        <div class="topo-arrow">
+          <div class="arrow-label">HTTP/HTTPS qua Proxy 127.0.0.1:8080</div>
+          <div class="arrow-line"></div>
+          <div style="font-size: 9pt; color: #555;">cổng 3000</div>
+        </div>
+
+        <div class="topo-node">
+          <div>Máy chủ web</div>
+          <div class="node-label">OWASP Juice Shop</div>
+          <div class="node-ip">192.168.99.100</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>Broken Authentication and Session Management</h3>
+    <p>Broken Authentication and Session Management là một trong những nhóm lỗ hổng phổ biến của OWASP Top 10.
+      Lỗ hổng này thường xuất phát từ việc đội ngũ phát triển triển khai chưa chặt chẽ các chức năng tưởng chừng
+      cơ bản như đăng nhập, quản lý session, đổi mật khẩu hay khôi phục mật khẩu, khiến kẻ tấn công có cơ hội
+      chiếm đoạt tài khoản của người dùng khác. Trong bài lab này, sinh viên sẽ trực tiếp trải nghiệm mấy dạng lỗi
+      hay gặp nhất: Session Token bị lộ thông tin nhạy cảm ngay trong JWT, mật khẩu được lưu trữ dưới dạng băm dễ
+      bị dò ra qua SQL Injection, chức năng Forgot Password dựa vào câu hỏi bảo mật quá dễ đoán, và lỗi cho phép
+      đổi mật khẩu mà không cần xác minh lại mật khẩu hiện tại.</p>
+
+    <h3>HTTP Request, Session và JSON Web Token (JWT)</h3>
+    <p>Vì bài lab yêu cầu phân tích và chỉnh sửa trực tiếp HTTP Request cũng như giải mã Session Token, sinh viên
+      cần nắm được cấu trúc Request (Request Line, Header, Body) và vai trò của Cookie, Session, JWT trong xác
+      thực người dùng. Đó cũng là lý do vì sao thông tin lưu trong JWT (ID, Email, Role, hash mật khẩu) có thể bị
+      khai thác nếu token bị lộ hoặc bị giải mã.</p>
+
+    <h3>Công cụ sử dụng trong bài</h3>
+    <table>
+      <tr>
+        <th style="width: 200px;">Công cụ / Chức năng</th>
+        <th>Mô tả tác dụng</th>
+      </tr>
+      <tr>
+        <td><code>Spider</code> (OWASP ZAP)</td>
+        <td>Tự động thu thập URL, tài nguyên của ứng dụng để phát hiện đường dẫn hoặc chức năng không hiển thị
+          trực tiếp trên giao diện.</td>
+      </tr>
+      <tr>
+        <td><code>Sites</code> / <code>History</code></td>
+        <td>Liệt kê các request đã ghi nhận được, dùng để tìm lại một request cụ thể cần chỉnh sửa hoặc phân tích.
+        </td>
+      </tr>
+      <tr>
+        <td><code>Alerts</code></td>
+        <td>Hiển thị các cảnh báo bảo mật do ZAP phát hiện sau khi quét, ví dụ cấu hình sai liên quan đến trang
+          quản trị.</td>
+      </tr>
+      <tr>
+        <td><code>JWT.io</code></td>
+        <td>Công cụ trực tuyến dùng để giải mã (decode) nội dung bên trong JSON Web Token.</td>
+      </tr>
+    </table>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+    <div class="box box-info">
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
+      <code>labtainer web-brokenauth</code>
+    </div>
+
+    <h3>Tài khoản được cấu hình sẵn</h3>
+    <table>
+      <tr>
+        <th>Username</th>
+        <th style="width: 160px;">Password</th>
+        <th>Systems</th>
+      </tr>
+      <tr>
+        <td><code>admin@juice.org</code></td>
+        <td><code>admin123</code></td>
+        <td>Admin for web login</td>
+      </tr>
+      <tr>
+        <td><code>jim@juice.org</code></td>
+        <td><code>ncc-1701</code></td>
+        <td>web login</td>
+      </tr>
+      <tr>
+        <td><code>Ubuntu</code></td>
+        <td><code>ubuntu</code></td>
+        <td>Student workstation, vulnerable server, Attacker workstation</td>
+      </tr>
+    </table>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 - Xác nhận kết nối giữa máy trạm của sinh viên và máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên (web-brokenauth), sử dụng lệnh
+          <code>ping</code> để xác nhận kết nối tới máy chủ web:
+        </p>
+        <pre><span class="cmd">ping 192.168.99.100</span></pre>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Nhận được phản hồi từ địa chỉ <code>192.168.99.100</code>,
+          xác nhận máy trạm và máy chủ web có thể liên lạc được với nhau.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 - Mở Firefox và truy cập vào máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh, gõ lệnh sau để mở trình duyệt Firefox:</p>
+        <pre><span class="cmd">firefox &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Trên Firefox, truy cập đường dẫn của ứng dụng web:</p>
+        <div class="box box-info">
+          <code>http://192.168.99.100:3000</code>
+        </div>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Truy cập thành công giao diện của ứng dụng OWASP Juice
+          Shop trên Firefox.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 - Khởi động và cấu hình OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh, khởi động OWASP ZAP:</p>
+        <pre><span class="cmd">owasp-zap &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Khi OWASP ZAP mở lên và yêu cầu nhập thông tin, sinh viên chọn "yes, I want to
+          persist this session with the name based on the current timestamp" rồi chọn <strong>Start</strong>.</p>
+
+        <p><strong>Bước 3:</strong> Nếu xuất hiện hộp thoại "Manage Add-on", sinh viên chọn <strong>Close</strong>
+          để tiếp tục.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> OWASP ZAP khởi động thành công và sẵn sàng để cấu hình
+          làm proxy.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 4 - Cấu hình Firefox Proxy để sử dụng OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Cấu hình OWASP ZAP làm proxy trung gian để bắt và phân tích các gói tin
+          HTTP/HTTPS truyền từ trình duyệt Firefox trên máy trạm của sinh viên. Thực hiện cấu hình trên trình
+          duyệt Firefox theo các bước sau đây:</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox của máy tính sinh viên, mở <strong>Preferences</strong>.</p>
+        <p><strong>Bước 2:</strong> Trong ô tìm kiếm cài đặt, gõ <code>proxy</code>.</p>
+        <p><strong>Bước 3:</strong> Trong mục <strong>Proxy Network</strong>, chọn <strong>Settings</strong>.</p>
+        <p><strong>Bước 4:</strong> Chọn <strong>Manual proxy configuration</strong> (Cấu hình proxy thủ công).</p>
+        <p><strong>Bước 5:</strong> Tại trường HTTP Proxy, nhập <code>127.0.0.1</code>, Port nhập <code>8080</code>.
+        </p>
+        <p><strong>Bước 6:</strong> Chọn thêm <strong>Also use this proxy for HTTPS</strong> (Sử dụng máy chủ proxy
+          này cho tất cả các giao thức).</p>
+        <p><strong>Bước 7:</strong> Chọn <strong>OK</strong> để chấp nhận các cài đặt.</p>
+
+        <p>Sau khi cấu hình xong, thực hiện các bước sau để xác nhận Firefox đang sử dụng ZAP làm proxy:</p>
+        <p><strong>Bước 8:</strong> Làm mới trang web <code>192.168.99.100:3000</code>. Một cảnh báo bảo mật với
+          thông báo "Kết nối của bạn không an toàn" sẽ xuất hiện.</p>
+        <p><strong>Bước 9:</strong> Chọn <strong>Advanced</strong> để xem chi tiết chứng chỉ SSL (thường hiển thị
+          lỗi <code>SEC_ERROR_UNKNOWN_ISSUER</code>), sau đó chọn <strong>Add Exception</strong> để chấp nhận
+          chứng chỉ này.</p>
+        <p><strong>Bước 10:</strong> Tại cửa sổ xác nhận, sinh viên tiếp tục bấm chọn <strong>Confirm Security
+            Exception</strong>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Firefox truy cập được ứng dụng web qua proxy của OWASP
+          ZAP, tab <strong>History</strong> trong ZAP bắt đầu ghi nhận các request.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 5 - Truy cập vào dữ liệu bị hạn chế</div>
+      <div class="task-body">
+        <p><strong>5.1 - Sử dụng Spider để thu thập URL của ứng dụng</strong></p>
+
+        <p><strong>Mục tiêu:</strong> Mục tiêu của phần này là sử dụng công cụ Spider của OWASP ZAP để tự động thu
+          thập các URL và tài nguyên của ứng dụng, qua đó xác định những đường dẫn hoặc chức năng không được hiển
+          thị trực tiếp trên giao diện nhưng vẫn có thể được truy cập. Theo OWASP WSTG-ATHZ-01, việc lập danh sách
+          các URL và thư mục của ứng dụng là một bước quan trọng trong quá trình kiểm thử phân quyền, giúp phát
+          hiện các khu vực quản trị hoặc tài nguyên nhạy cảm bị lộ do cấu hình chưa phù hợp. Trong bài thực hành
+          này, kết quả quét sẽ được sử dụng để tìm đường dẫn ẩn, cấu hình liên quan đến trang quản trị admin.</p>
+
+        <p><strong>Bước 1:</strong> Tại tab <strong>Sites</strong> của OWASP ZAP, chọn trang
+          <code>192.168.99.100:3000</code>, sau đó vào <strong>Attack</strong> → <strong>Spider</strong> để bắt
+          đầu quét.
+        </p>
+
+        <p><strong>Bước 2:</strong> Sau khi quét hoàn tất, vào mục <strong>Alert</strong> để đọc các đường dẫn quét
+          được và trả lời câu hỏi: sinh viên có thấy bất kỳ liên kết nào đến các trang quản trị không?</p>
+
+        <p><strong>Bước 3:</strong> Lưu kết quả quét dưới dạng báo cáo HTML, lưu tại Desktop với tên
+          <code>traversal.html</code>. Trường hợp không có tùy chọn Traversal, hãy lưu toàn bộ báo cáo.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định được đường dẫn liên quan đến trang quản trị của
+          ứng dụng thông qua kết quả Spider và lưu được báo cáo quét.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong><br />
+          Đường dẫn quản trị nào sinh viên tìm thấy qua kết quả Spider và vì sao đường dẫn này không nên bị lộ với
+          người dùng thông thường?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+
+        <p><strong>5.2 - Truy cập trang quản trị và thao tác với Customer Feedback</strong></p>
+
+        <p><strong>Bước 1:</strong> Trên trình duyệt Firefox, truy cập địa chỉ:
+          <code>http://192.168.99.100:3000/#/search</code>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Đăng nhập bằng tài khoản quản trị:</p>
+        <div class="box box-info">
+          Email: <code>admin@juice.org</code><br />
+          Password: <code>admin123</code>
+        </div>
+
+        <p><strong>Bước 3:</strong> Sau khi đăng nhập thành công, truy cập trang quản trị:
+          <code>http://192.168.99.100:3000/#/administration</code>.
+        </p>
+
+        <p><strong>Bước 4:</strong> Tại giao diện Administration, tìm đến mục <strong>Customer Feedback</strong>.
+          Thực hiện xóa toàn bộ các phản hồi có đánh giá 1 sao.</p>
+
+        <p><strong>Bước 5:</strong> Thực hiện vào ZAP, chọn tab <strong>History</strong> và thực hiện nhận xét các
+          phản hồi (request/response) khi thao tác xóa.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xóa thành công toàn bộ các phản hồi đánh giá 1 sao và
+          quan sát được request tương ứng trong tab History của ZAP.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong><br />
+          Việc tài khoản admin có toàn quyền xóa phản hồi khách hàng nói lên điều gì về thiết kế phân quyền của
+          ứng dụng? Nếu chức năng này bị lộ cho người dùng thường thì hậu quả sẽ như thế nào?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 6 - Review và giải mã Session Token</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Mục tiêu của nhiệm vụ này là tìm hiểu cơ chế quản lý phiên làm việc của ứng
+          dụng thông qua Session Token. Sinh viên sẽ thu thập token sau khi đăng nhập, giải mã để xem các thông
+          tin được lưu trữ bên trong và hiểu được vai trò của token trong cơ chế xác thực người dùng cũng như
+          những rủi ro khi token bị lộ. Để bắt đầu kiểm tra, thực hiện theo các bước sau.</p>
+
+        <p><strong>Bước 1:</strong> Mở Developer Tools → <strong>Network</strong>.</p>
+        <p><strong>Bước 2:</strong> Thực hiện đăng nhập tài khoản Jim (<code>jim@juice.org</code> /
+          <code>ncc-1701</code>).
+        </p>
+        <p><strong>Bước 3:</strong> Tìm tới request <code>POST /rest/user/login</code>.</p>
+        <p><strong>Bước 4:</strong> Chọn tab <strong>Response</strong> để lấy giá trị Session Token (JWT) trả về.
+        </p>
+
+        <p><strong>Bước 5:</strong> Mở một tab mới trên trình duyệt và truy cập <code>https://jwt.io/</code>.
+          Trong ô <strong>Encoded</strong>, dán giá trị JWT đã thu thập được từ phản hồi của yêu cầu đăng nhập.</p>
+
+        <p><strong>Bước 6:</strong> Sau khi giải mã, quan sát các thông tin được lưu trữ trong token như ID,
+          Email, Vai trò (Role) và giá trị băm (MD5) của mật khẩu.</p>
+
+        <p><strong>Bước 7:</strong> Sao chép giá trị băm của trường password, sau đó sử dụng Google hoặc một công
+          cụ giải mã MD5 để xác định mật khẩu gốc của người dùng.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Giải mã thành công JWT và xác định được mật khẩu gốc của
+          tài khoản Jim từ giá trị băm MD5.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong><br />
+          Vì sao việc lưu thông tin nhạy cảm (bao gồm mật khẩu đã băm) trực tiếp trong JWT lại tiềm ẩn rủi ro bảo
+          mật, dù nội dung JWT chỉ được encode chứ không được mã hóa?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 7 - Khai thác SQL Injection để thu thập thông tin người dùng</div>
+      <div class="task-body">
+        <p>
+          Mục tiêu của nhiệm vụ này là khai thác lỗ hổng SQL Injection để thu thập thông tin người dùng và giá trị
+          băm của mật khẩu từ cơ sở dữ liệu. Sau đó, sinh viên sẽ sử dụng các công cụ giải mã MD5 để xác định mật
+          khẩu gốc và đánh giá mức độ an toàn của cơ chế xác thực của ứng dụng.
+        </p>
+
+        <p><strong>Bước 1:</strong> Thực hiện truy cập địa chỉ sau tại thanh tìm kiếm sản phẩm của ứng dụng:</p>
+        <div class="box box-info">
+          <code>http://192.168.99.100:3000/rest/products/search?q=%27))%20union%20select%20null,id,email,password,totpsecret,null,null,null,null%20from%20users--</code>
+        </div>
+
+        <p><strong>Bước 2:</strong> Quan sát phản hồi (Response) của ứng dụng. Nếu khai thác thành công, hệ thống
+          sẽ trả về danh sách người dùng cùng các thông tin tương tự hình dưới.</p>
+
+        <p><strong>Bước 3:</strong> Xác định giá trị của trường <code>price</code> trong kết quả trả về. Đây chính
+          là giá trị băm (MD5) của mật khẩu được lưu trữ trong cơ sở dữ liệu.</p>
+
+        <p><strong>Bước 4:</strong> Sao chép một hoặc nhiều giá trị băm và sử dụng Google hoặc công cụ giải mã MD5
+          để xác định mật khẩu gốc của người dùng. Đối chiếu kết quả giải mã với thông tin thu được trong Nhiệm vụ
+          6 và ghi nhận kết quả.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Trích xuất thành công danh sách người dùng cùng giá trị
+          băm mật khẩu và xác định được ít nhất một mật khẩu gốc.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 4:</strong><br />
+          Nêu nguyên nhân gốc rễ khiến câu truy vấn SQL Injection ở trên có thể trả về toàn bộ dữ liệu người dùng,
+          và đề xuất biện pháp phòng chống tương ứng.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 8 - Kiểm thử quản lý mật khẩu</div>
+      <div class="task-body">
+        <p><strong>8.1 - Thay đổi mật khẩu (Password Change)</strong></p>
+
+        <p><strong>Mục tiêu:</strong> Mục tiêu của nhiệm vụ này là tìm hiểu cơ chế thay đổi và đặt lại mật khẩu của
+          ứng dụng, đồng thời đánh giá mức độ an toàn của các chức năng này. Sinh viên sẽ thực hiện kiểm tra quá
+          trình thay đổi mật khẩu để xác định liệu kẻ tấn công có thể thay đổi mật khẩu của người dùng hay không.
+          Qua đó, sinh viên hiểu được những rủi ro khi cơ chế quản lý mật khẩu được thiết kế không an toàn. Để
+          thực hiện nhiệm vụ, hãy làm theo các bước dưới đây.</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox, đăng nhập bằng tài khoản: Email: <code>jim@juice.org</code>
+          Password: <code>ncc-1701</code>. Sau khi đăng nhập thành công, thay đổi mật khẩu của Jim thành
+          <code>abcde</code>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Trong OWASP ZAP, mở tab <strong>History</strong> và quan sát request gửi đến
+          máy chủ khi thực hiện thay đổi mật khẩu.</p>
+
+        <p><strong>Bước 3:</strong> Tìm phản hồi trong tab History liên quan đến endpoint:
+          <code>rest/user/change-password?</code>.
+        </p>
+
+        <p><strong>Bước 4:</strong> Xóa cụm từ trong dấu <code>current=abcde</code> và thực hiện gửi lại request.
+        </p>
+
+        <p><strong>Bước 5:</strong> Sau đó hãy lặp lại với user <code>admin</code> và cập nhật mật khẩu thành
+          <code>P@ssword#1</code> và cho nhận xét.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Đổi thành công mật khẩu của tài khoản Jim và admin mà
+          không cần cung cấp đúng mật khẩu hiện tại.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 5:</strong><br />
+          Vì sao việc chỉ cần loại bỏ tham số <code>current</code> trong request lại cho phép thay đổi mật khẩu mà
+          không cần xác thực mật khẩu hiện tại? Lỗ hổng này thuộc nhóm nào trong OWASP Top 10?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+
+        <p><strong>8.2 - Khai thác chức năng Forgot Password</strong></p>
+
+        <p>Để minh họa rủi ro khi sử dụng câu hỏi bảo mật với thông tin dễ đoán hoặc bị công khai, thực hiện đặt
+          lại mật khẩu của tài khoản <code>bjoern@owasp.org</code> bằng chức năng Forgot Password. Các bước thực
+          hiện:</p>
+
+        <p><strong>Bước 1:</strong> Trên trình duyệt Firefox, truy cập địa chỉ:
+          <code>http://192.168.99.100:3000/#/forgot-password</code>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Trong ô Email, nhập: <code>bjoern@owasp.org</code>.</p>
+
+        <p><strong>Bước 3:</strong> Khi hệ thống hiển thị câu hỏi bảo mật "Tên thú cưng yêu thích của bạn?", nhập
+          câu trả lời: <code>Zaya</code>.</p>
+
+        <p><strong>Bước 4:</strong> Nhập mật khẩu mới bất kỳ và xác nhận lại mật khẩu.</p>
+
+        <p><strong>Bước 5:</strong> Nhấn <strong>Change</strong> để hoàn tất quá trình đặt lại mật khẩu.</p>
+
+        <p><strong>Bước 6:</strong> Đăng nhập lại bằng tài khoản <code>bjoern@owasp.org</code> với mật khẩu mới để
+          xác nhận việc đặt lại mật khẩu thành công.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Đặt lại thành công mật khẩu của tài khoản
+          <code>bjoern@owasp.org</code> và đăng nhập được bằng mật khẩu mới.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 6:</strong><br />
+          Việc sử dụng câu hỏi bảo mật (security question) như "Tên thú cưng yêu thích" tiềm ẩn những rủi ro gì,
+          đặc biệt khi thông tin này có thể bị công khai trên mạng xã hội hoặc trong các buổi phỏng vấn/thuyết
+          trình công khai?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+    </div>
+
+  </div>
+</body>
+
+</html>
