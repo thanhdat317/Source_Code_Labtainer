@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành - aaa-db-access</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-easy {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .badge-network {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .badge-protocol {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 12pt;
+      color: #2e4053;
+      margin: 16px 0 6px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd {
+      color: #89dceb;
+    }
+
+    pre .comment {
+      color: #8b93a8;
+      font-style: italic;
+    }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .box strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .topo-node .node-label {
+      font-size: 10pt;
+      opacity: 0.9;
+    }
+
+    .topo-node .node-ip {
+      font-size: 9pt;
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 20px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .topo-arrow .arrow-line {
+      width: 120px;
+      height: 2px;
+      background: #27ae60;
+    }
+
+    /* Hub-style topology (server ở trên, các máy trạm bên dưới) dùng cho bài lab này */
+    .topo-hub {
+      display: inline-block;
+      max-width: 100%;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 22px 24px 18px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      box-sizing: border-box;
+    }
+
+    .topo-hub .hub-server {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .topo-hub .hub-vline {
+      width: 2px;
+      height: 20px;
+      background: #27ae60;
+      margin: 0 auto 0;
+    }
+
+    .topo-hub .hub-hline {
+      height: 2px;
+      background: #27ae60;
+      margin: 0 auto 18px;
+      width: 560px;
+      max-width: 100%;
+    }
+
+    .topo-hub .hub-branches {
+      display: grid;
+      grid-template-columns: repeat(4, 128px);
+      justify-content: center;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .topo-hub .hub-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .topo-hub .hub-branch-vline {
+      width: 2px;
+      height: 16px;
+      background: #27ae60;
+    }
+
+    .topo-hub .topo-node {
+      min-width: 0;
+      width: 100%;
+      flex: 1;
+      min-height: 92px;
+      padding: 10px 8px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .topo-hub .hub-server .topo-node {
+      width: auto;
+      min-width: 200px;
+      min-height: 0;
+      padding: 12px 18px;
+    }
+
+    .topo-hub .topo-node>div:first-child {
+      font-size: 10pt;
+      font-weight: bold;
+      line-height: 1.3;
+    }
+
+    .topo-hub .topo-node .node-label {
+      font-size: 8.5pt;
+    }
+
+    .topo-hub .topo-node .node-ip {
+      font-size: 8pt;
+    }
+
+    .topo-hub .hub-legend {
+      margin-top: 16px;
+      font-size: 9.5pt;
+      color: #555;
+      font-style: italic;
+      text-align: center;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Bảng phân quyền trực quan - Nhiệm vụ 3 */
+    .perm-table th {
+      text-align: center;
+    }
+
+    .perm-table td {
+      vertical-align: middle;
+    }
+
+    .perm-user-cell {
+      font-weight: bold;
+      color: #003087;
+    }
+
+    .perm-user-role {
+      display: block;
+      font-weight: normal;
+      font-style: italic;
+      color: #555;
+      font-size: 10.5pt;
+      margin-top: 2px;
+    }
+
+    .perm-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .perm-list li {
+      margin-bottom: 4px;
+      font-size: 11.5pt;
+    }
+
+    .perm-yes::before {
+      content: "✔";
+      color: #216e39;
+      font-weight: bold;
+      margin-right: 6px;
+    }
+
+    .perm-no::before {
+      content: "✘";
+      color: #c0392b;
+      font-weight: bold;
+      margin-right: 6px;
+    }
+
+    .dept-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 10.5pt;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .dept-exec {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    .dept-hr {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .dept-fin {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .dept-it {
+      background: #f3e5f5;
+      color: #6a1b9a;
+      border: 1px solid #d8b6e0;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body {
+      padding: 14px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">aaa-db-access - Kiểm soát chia sẻ thông tin trong cơ sở dữ liệu SQL theo chính sách bảo mật
+        thông tin</div>
+      <div class="meta">
+        <span class="badge badge-protocol">Mức độ: Trung bình</span>
+        <span class="badge badge-network">An toàn CSDL - MySQL</span>
+        <span class="badge badge-easy">Kiểm soát truy cập</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+
+    <table>
+      <tr>
+        <th style="width: 220px;">Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td><strong>Tên Lab</strong></td>
+        <td><code>aaa-db-access</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mức độ</strong></td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td><strong>Công cụ sử dụng</strong></td>
+        <td><code>MySQL (CLI)</code></td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <ul>
+      <li>Hiểu cấu trúc cơ bản của cơ sở dữ liệu quan hệ và mối quan hệ giữa các bảng trong MySQL.</li>
+      <li>Thực hành kết nối MySQL qua dòng lệnh và thực hiện các truy vấn SQL cơ bản.</li>
+      <li>Quản lý phân quyền truy cập trong MySQL thông qua các lệnh cấp, thu hồi và kiểm tra quyền người dùng.</li>
+      <li>Áp dụng chính sách bảo mật để cấu hình quyền truy cập phù hợp với từng vai trò người dùng.</li>
+      <li>Kiểm tra hiệu quả của cấu hình phân quyền sau khi thay đổi, qua đó hiểu vai trò của kiểm soát truy cập
+        trong bảo vệ dữ liệu.</li>
+    </ul>
+
+    <h3>Yêu cầu đối với sinh viên</h3>
+    <ul>
+      <li>Nắm được kiến thức cơ bản về hệ điều hành Linux và sử dụng thành thạo các lệnh trên Terminal.</li>
+      <li>Hiểu các khái niệm cơ bản về cơ sở dữ liệu quan hệ và hệ quản trị cơ sở dữ liệu MySQL.</li>
+      <li>Biết sử dụng các câu lệnh SQL cơ bản như <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code> và
+        <code>DELETE</code>.</li>
+      <li>Hiểu cơ chế quản lý tài khoản và phân quyền trong MySQL, bao gồm các lệnh <code>GRANT</code>,
+        <code>REVOKE</code> và <code>FLUSH PRIVILEGES</code>.</li>
+      <li>Có kiến thức cơ bản về kiểm soát truy cập và phân quyền người dùng trong hệ quản trị cơ sở dữ liệu.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+
+    <strong>Tình huống:</strong><br />
+    Trong hệ thống quản lý nhân sự của một doanh nghiệp sử dụng cơ sở dữ liệu MySQL, các tài khoản người dùng ban đầu
+    đều được cấp toàn quyền truy cập nhằm phục vụ quá trình phát triển và kiểm thử hệ thống. Trước khi hệ thống được
+    đưa vào vận hành chính thức, doanh nghiệp yêu cầu xây dựng chính sách phân quyền nhằm giới hạn quyền truy cập của
+    từng người dùng theo chức năng và nhiệm vụ công việc. Sinh viên đóng vai trò Quản trị viên cơ sở dữ liệu (Database
+    Administrator - DBA), được giao nhiệm vụ rà soát, cấu hình lại quyền truy cập cho các tài khoản người dùng và
+    kiểm tra việc thực thi chính sách phân quyền nhằm đảm bảo hệ thống đáp ứng các yêu cầu về bảo mật dữ liệu.
+
+    <p><strong>Vai trò của sinh viên:</strong></p>
+    <ul>
+      <li>Khảo sát hệ thống: đăng nhập bằng các tài khoản người dùng khác nhau để quan sát quyền truy cập mặc định và
+        xác định các quyền chưa phù hợp với chính sách bảo mật.</li>
+      <li>Cấu hình phân quyền: sử dụng các lệnh <code>REVOKE</code>, <code>GRANT</code> và
+        <code>FLUSH PRIVILEGES</code> để thu hồi và cấp lại quyền truy cập cho từng tài khoản theo chính sách phân
+        quyền của doanh nghiệp.</li>
+      <li>Kiểm tra quyền truy cập: đăng nhập bằng từng tài khoản và thực thi các tệp kiểm tra tương ứng để xác minh
+        các quyền đã được cấu hình chính xác.</li>
+      <li>Đánh giá kết quả: đối chiếu kết quả thực thi với chính sách phân quyền, đảm bảo mỗi người dùng chỉ được
+        phép truy cập và thao tác trên dữ liệu được cấp quyền, không thể truy cập hoặc thực hiện thao tác ngoài phạm
+        vi cho phép.</li>
+    </ul>
+
+    <h3>Sơ đồ mạng</h3>
+    <div class="topology">
+      <div class="topo-hub">
+        <div class="hub-server">
+          <div class="topo-node">
+            <div>Máy chủ cơ sở dữ liệu</div>
+            <div class="node-label">MySQL Server - database</div>
+            <div class="node-ip">host: database</div>
+          </div>
+        </div>
+        <div class="hub-vline"></div>
+        <div class="hub-hline" style="width: 560px;"></div>
+        <div class="hub-branches">
+          <div class="hub-branch">
+            <div class="hub-branch-vline"></div>
+            <div class="topo-node">
+              <div>Máy trạm Executive</div>
+              <div class="node-label">Steven - President</div>
+              <div class="node-ip">user: steven</div>
+            </div>
+          </div>
+          <div class="hub-branch">
+            <div class="hub-branch-vline"></div>
+            <div class="topo-node">
+              <div>Máy trạm HR</div>
+              <div class="node-label">Susan - HR Rep.</div>
+              <div class="node-ip">user: susan</div>
+            </div>
+          </div>
+          <div class="hub-branch">
+            <div class="hub-branch-vline"></div>
+            <div class="topo-node">
+              <div>Máy trạm Finance</div>
+              <div class="node-label">Nancy - Finance Mgr.</div>
+              <div class="node-ip">user: nancy</div>
+            </div>
+          </div>
+          <div class="hub-branch">
+            <div class="hub-branch-vline"></div>
+            <div class="topo-node">
+              <div>Máy trạm IT</div>
+              <div class="node-label">David - Programmer</div>
+              <div class="node-ip">user: david</div>
+            </div>
+          </div>
+        </div>
+        <div class="hub-legend">Mỗi máy trạm kết nối tới máy chủ database qua kết nối MySQL (mysql -h database)
+          bằng tài khoản riêng của phòng ban mình.</div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>3.1 Quản lý người dùng và phân quyền trong MySQL</h3>
+    <p>Sinh viên cần nắm được cơ chế quản lý tài khoản và phân quyền trong MySQL, bao gồm cách tạo người dùng, cấp và
+      thu hồi quyền truy cập bằng các lệnh <code>GRANT</code> và <code>REVOKE</code>. Đồng thời, sinh viên cần hiểu
+      nguyên tắc <strong>Least Privilege (đặc quyền tối thiểu)</strong>, theo đó mỗi người dùng chỉ được cấp những
+      quyền cần thiết để thực hiện công việc, hạn chế tối đa nguy cơ truy cập trái phép hoặc làm thay đổi dữ liệu
+      ngoài phạm vi cho phép.</p>
+
+    <h3>3.2 Kiểm tra và xác minh quyền truy cập</h3>
+    <p>Sinh viên cần biết cách đăng nhập vào MySQL bằng các tài khoản người dùng khác nhau để kiểm tra quyền truy cập
+      sau khi cấu hình. Đồng thời, cần hiểu cách sử dụng các tệp kiểm tra (<code>steven.sql</code>,
+      <code>susan.sql</code>, <code>nancy.sql</code>, <code>david.sql</code>) nhằm xác minh rằng các quyền đã được
+      cấu hình đúng theo chính sách bảo mật và yêu cầu của bài thực hành.</p>
+
+    <h3>3.3 Phụ lục - Lược đồ cơ sở dữ liệu MYCO</h3>
+    <p>Cơ sở dữ liệu <code>MYCO</code> sử dụng trong bài lab gồm 7 bảng có quan hệ khóa ngoại với nhau như sau:</p>
+
+    <h4>Bảng employees</h4>
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th style="width: 70px;">Null</th>
+        <th style="width: 90px;">Key</th>
+        <th>Extra</th>
+      </tr>
+      <tr>
+        <td><code>employee_id</code></td>
+        <td>int(11)</td>
+        <td>NO</td>
+        <td>Primary</td>
+        <td>auto_increment</td>
+      </tr>
+      <tr>
+        <td><code>first_name</code></td>
+        <td>varchar(20)</td>
+        <td>YES</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>last_name</code></td>
+        <td>varchar(25)</td>
+        <td>NO</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>email</code></td>
+        <td>varchar(100)</td>
+        <td>NO</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>phone_number</code></td>
+        <td>varchar(20)</td>
+        <td>YES</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>hire_date</code></td>
+        <td>date</td>
+        <td>NO</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>job_id</code></td>
+        <td>int(11)</td>
+        <td>NO</td>
+        <td>Foreign</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>salary</code></td>
+        <td>decimal(8,2)</td>
+        <td>NO</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>manager_id</code></td>
+        <td>int(11)</td>
+        <td>YES</td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>department_id</code></td>
+        <td>int(11)</td>
+        <td>YES</td>
+        <td>Foreign</td>
+        <td></td>
+      </tr>
+    </table>
+
+    <h4>Bảng departments, jobs, dependents</h4>
+    <table>
+      <tr>
+        <th style="width: 160px;">Bảng</th>
+        <th>Các cột chính</th>
+      </tr>
+      <tr>
+        <td><code>departments</code></td>
+        <td><code>department_id</code> (Primary, auto_increment)<br />
+          <code>department_name</code> varchar(30)<br />
+          <code>location_id</code> int(11) (Foreign)</td>
+      </tr>
+      <tr>
+        <td><code>jobs</code></td>
+        <td><code>job_id</code> (Primary, auto_increment)<br />
+          <code>job_title</code> varchar(35)<br />
+          <code>min_salary</code> decimal(8,2)<br />
+          <code>max_salary</code> decimal(8,2)</td>
+      </tr>
+      <tr>
+        <td><code>dependents</code></td>
+        <td><code>dependent_id</code> (Primary, auto_increment)<br />
+          <code>first_name</code> varchar(50)<br />
+          <code>last_name</code> varchar(50)<br />
+          <code>relationship</code> varchar(25)<br />
+          <code>employee_id</code> int(11) (Foreign)</td>
+      </tr>
+    </table>
+
+    <h4>Bảng locations, countries, regions</h4>
+    <table>
+      <tr>
+        <th style="width: 160px;">Bảng</th>
+        <th>Các cột chính</th>
+      </tr>
+      <tr>
+        <td><code>locations</code></td>
+        <td><code>location_id</code> (Primary, auto_increment)<br />
+          <code>street_address</code><br />
+          <code>postal_code</code><br />
+          <code>city</code> varchar(30)<br />
+          <code>state_province</code><br />
+          <code>country_id</code> char(2) (Foreign)</td>
+      </tr>
+      <tr>
+        <td><code>countries</code></td>
+        <td><code>country_id</code> char(2) (Primary)<br />
+          <code>country_name</code> varchar(40)<br />
+          <code>region_id</code> int(11) (Foreign)</td>
+      </tr>
+      <tr>
+        <td><code>regions</code></td>
+        <td><code>region_id</code> (Primary, auto_increment)<br />
+          <code>region_name</code> varchar(25)</td>
+      </tr>
+    </table>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+    <div class="box box-info">
+      Trước khi thực hiện bài thực hành sinh viên thực hiện chạy câu lệnh:<br />
+      <code>imodule https://raw.githubusercontent.com/thanhdat317/Imodule_labtainer/master/aaa-db-access.tar</code><br /><br />
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh:<br />
+      <code>labtainer aaa-db-access</code>
+    </div>
+
+    <h3>Thông tin các tài khoản được sử dụng trong bài lab</h3>
+    <table>
+      <tr>
+        <th>Employee Name</th>
+        <th>Department</th>
+        <th>Job Title</th>
+        <th style="width: 100px;">Username</th>
+        <th style="width: 130px;">Password</th>
+      </tr>
+      <tr>
+        <td>Steven King</td>
+        <td><span class="dept-badge dept-exec">Executive</span></td>
+        <td>President</td>
+        <td><code>steven</code></td>
+        <td><code>pass4steven</code></td>
+      </tr>
+      <tr>
+        <td>Susan Mavris</td>
+        <td><span class="dept-badge dept-hr">Human Resources</span></td>
+        <td>HR Representative</td>
+        <td><code>susan</code></td>
+        <td><code>pass4susan</code></td>
+      </tr>
+      <tr>
+        <td>Nancy Greenberg</td>
+        <td><span class="dept-badge dept-fin">Finance</span></td>
+        <td>Finance Manager</td>
+        <td><code>nancy</code></td>
+        <td><code>pass4nancy</code></td>
+      </tr>
+      <tr>
+        <td>David Austin</td>
+        <td><span class="dept-badge dept-it">IT</span></td>
+        <td>Programmer</td>
+        <td><code>david</code></td>
+        <td><code>pass4david</code></td>
+      </tr>
+      <tr>
+        <td>You</td>
+        <td><span class="dept-badge dept-it">IT</span></td>
+        <td>DBA (trên máy database)</td>
+        <td><code>admin</code></td>
+        <td><code>admin</code></td>
+      </tr>
+    </table>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 - Bài kiểm tra trước khi bắt đầu lab</div>
+      <div class="task-body">
+        <p>Trước khi bắt đầu bài thực hành, sinh viên cần hoàn thành bài kiểm tra đầu vào nhằm đánh giá kiến thức về
+          chính sách kiểm soát truy cập và phân quyền trong cơ sở dữ liệu được triển khai trong bài lab này.</p>
+
+        <p><strong>Bước 1:</strong> Mở Terminal khởi động lab và chạy lệnh sau để bắt đầu bài kiểm tra:</p>
+        <pre><span class="cmd">quiz -l aaa-db-access</span></pre>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Hoàn thành bài kiểm tra đầu vào trước khi chuyển sang các
+          nhiệm vụ tiếp theo.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong>
+          <br>Vì sao cần kiểm tra kiến thức về kiểm soát truy cập trước khi thực hành cấu hình phân quyền trên hệ
+          quản trị cơ sở dữ liệu?
+          <br>
+          <strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 - Khám phá</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Môi trường bài thực hành gồm một máy chủ cơ sở dữ liệu (database) và bốn máy
+          trạm đại diện cho các phòng ban trong công ty (executive, hr, finance, it). Mỗi máy trạm sử dụng một tài
+          khoản MySQL khác nhau để truy cập cơ sở dữ liệu. Sinh viên sẽ dùng các máy trạm này để quan sát quyền truy
+          cập mặc định trước khi cấu hình lại theo chính sách bảo mật ở Nhiệm vụ 3.</p>
+
+        <p><strong>Bước 1: Đăng nhập cơ sở dữ liệu.</strong> Từ mỗi máy trạm, đăng nhập vào máy chủ cơ sở dữ liệu
+          bằng tài khoản tương ứng. Ví dụ, trên máy <code>finance</code>, sử dụng lệnh:</p>
+        <pre><span class="cmd">mysql -h database -u nancy -ppass4nancy</span></pre>
+        <p>Tương tự, đăng nhập trên các máy <code>executive</code>, <code>hr</code> và <code>it</code> bằng tài khoản
+          được cấp tương ứng ở bảng phía trên.</p>
+
+        <p><strong>Bước 2: Đăng nhập với quyền quản trị.</strong> Trên máy <code>database</code>, đăng nhập với quyền
+          quản trị viên:</p>
+        <pre><span class="cmd">mysql -u admin -padmin</span></pre>
+        <p><strong>Bước 3: Kiểm tra trạng thái ban đầu.</strong> Sau khi đăng nhập, kiểm tra các cơ sở dữ liệu mà
+          người dùng hiện có thể truy cập:</p>
+        <pre><span class="cmd">SHOW DATABASES;</span></pre>
+        <p>Tiếp theo, chuyển sang cơ sở dữ liệu <code>MYCO</code> và liệt kê các bảng:</p>
+        <pre><span class="cmd">USE MYCO;
+SHOW TABLES;</span></pre>
+
+        <div class="box box-warning">
+          <strong>Lưu ý:</strong> Ở trạng thái ban đầu, các tài khoản được cấp nhiều quyền truy cập hơn mức cần
+          thiết. Đây là cơ sở để thực hiện việc thu hồi và cấp lại quyền truy cập theo chính sách bảo mật ở Nhiệm vụ
+          3.
+        </div>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Đăng nhập thành công vào máy chủ database bằng cả tài
+          khoản người dùng thông thường và tài khoản admin, đồng thời xác định được các cơ sở dữ liệu/bảng mà mỗi tài
+          khoản đang được phép truy cập ở trạng thái mặc định.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong>
+          <br>Ở trạng thái mặc định, các tài khoản người dùng đang được cấp những quyền truy cập nào vượt quá nhu cầu
+          công việc thực tế của họ, và điều này tiềm ẩn rủi ro bảo mật gì?
+          <br>
+          <strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 - Kiểm soát quyền truy cập vào cơ sở dữ liệu</div>
+      <div class="task-body">
+        <p>Trong nhiệm vụ này, sinh viên đóng vai trò quản trị viên cơ sở dữ liệu (DBA) và thực hiện cấu hình quyền
+          truy cập cho các tài khoản người dùng theo chính sách bảo mật của công ty.</p>
+
+        <p><strong>Bước 1:</strong> Trên giao diện dòng lệnh của máy <code>database</code>, đăng nhập vào MySQL bằng
+          tài khoản quản trị (<code>mysql -u admin -padmin</code>). Sử dụng các lệnh <code>REVOKE</code> và
+          <code>GRANT</code> để thu hồi các quyền không cần thiết và cấp lại quyền phù hợp cho từng người dùng theo
+          chính sách của công ty, sau đó chạy <code>FLUSH PRIVILEGES;</code> để áp dụng các thay đổi.</p>
+
+        <p>Quyền truy cập và quyền thao tác trên từng bảng sẽ khác nhau tùy theo vai trò của mỗi người dùng, cụ thể
+          như sau:</p>
+
+        <table class="perm-table">
+          <tr>
+            <th style="width: 150px;">Người dùng</th>
+            <th>Được xem (SELECT)</th>
+            <th>Được thêm / sửa / xóa</th>
+            <th>Không được phép</th>
+          </tr>
+          <tr>
+            <td class="perm-user-cell">Steven
+              <span class="perm-user-role">President</span>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-yes"><code>employees</code>, <code>departments</code>, <code>jobs</code>,
+                  <code>dependents</code></li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-yes"><code>employees</code> (INSERT, UPDATE, DELETE)</li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-no">Tạo / sửa / xóa các CSDL hệ thống (<code>mysql</code>,
+                  <code>performance_schema</code>, <code>sys</code>...)</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="perm-user-cell">Susan
+              <span class="perm-user-role">HR Representative</span>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-yes"><code>employees</code>, <code>dependents</code>, <code>departments</code></li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-yes"><code>employees</code>, <code>dependents</code> (INSERT, UPDATE, DELETE)</li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-no">Thêm / sửa / xóa dữ liệu bảng <code>departments</code></li>
+                <li class="perm-no">Truy cập các CSDL hệ thống khác</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="perm-user-cell">Nancy
+              <span class="perm-user-role">Finance Manager</span>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-yes"><code>employees</code>, <code>jobs</code></li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-no">Không có bảng nào</li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-no">Xem bảng <code>dependents</code></li>
+                <li class="perm-no">Thêm / sửa / xóa dữ liệu</li>
+                <li class="perm-no">Truy cập các CSDL hệ thống khác</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td class="perm-user-cell">David
+              <span class="perm-user-role">Programmer</span>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-yes"><code>employees</code>, <code>jobs</code> (trừ cột <code>min_salary</code>,
+                  <code>max_salary</code>)</li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-no">Không có bảng nào</li>
+              </ul>
+            </td>
+            <td>
+              <ul class="perm-list">
+                <li class="perm-no">Xem cột <code>min_salary</code>, <code>max_salary</code> trong <code>jobs</code>
+                </li>
+                <li class="perm-no">Thêm / sửa / xóa dữ liệu</li>
+                <li class="perm-no">Truy cập các CSDL hệ thống khác</li>
+              </ul>
+            </td>
+          </tr>
+        </table>
+        <p style="font-size: 10.5pt; color: #555; font-style: italic;">Ghi chú: tất cả người dùng đều được xem các
+          trường thông tin cơ bản của nhân viên (<code>employee_id</code>, <code>first_name</code>,
+          <code>last_name</code>, <code>email</code>, <code>phone_number</code>, <code>department_id</code>,
+          <code>manager_id</code>); phạm vi bảng/cột và quyền thao tác chi tiết theo từng vai trò được liệt kê ở bảng
+          trên.</p>
+
+        <div class="box box-warning">
+          <strong>LƯU Ý:</strong> Bên trong mỗi máy trạm có sẵn một tệp <code>&lt;person&gt;.sql</code> (ví dụ:
+          <code>steven.sql</code>, <code>susan.sql</code>, <code>nancy.sql</code>, <code>david.sql</code>) dùng cho
+          mục đích kiểm tra công việc. <strong>KHÔNG CHỈNH SỬA</strong> những tệp tin này.
+        </div>
+
+        <p><strong>Bước 2: Kiểm tra kết quả phân quyền.</strong> Trên mỗi máy trạm, đăng nhập bằng tài khoản tương
+          ứng và thực thi tệp kiểm tra để xác nhận các quyền đã được cấu hình đúng, ví dụ trên máy finance:</p>
+        <pre><span class="cmd">mysql -h database -u nancy -ppass4nancy &lt; nancy.sql</span></pre>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Mỗi tài khoản người dùng chỉ truy cập và thao tác được
+          đúng phạm vi dữ liệu theo bảng phân quyền ở trên; kết quả thực thi các tệp <code>&lt;person&gt;.sql</code>
+          khớp với chính sách bảo mật đã cấu hình.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong>
+          <br>Vì sao Nancy (Finance Manager) không được cấp quyền xem bảng <code>dependents</code>, và việc giới
+          hạn quyền theo đúng vai trò công việc như vậy giúp bảo vệ dữ liệu của hệ thống như thế nào?
+          <br>
+          <strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+      <p>Bài thực hành này được chỉnh sửa và biên soạn từ bài "db-access" trong hệ thống Labtainer của Trung tâm An
+        ninh mạng và Tác chiến không gian mạng, Trường Sau đại học Hải quân Hoa Kỳ.</p>
+    </div>
+
+  </div>
+</body>
+
+</html>

@@ -457,7 +457,7 @@
         <td>Lưu lại nội dung Response Body nhận được (ví dụ nội dung tệp <code>/etc/passwd</code>) ra tệp tin.</td>
       </tr>
       <tr>
-        <td><code>Report</code> (Application)</td>
+        <td><code>Report</code></td>
         <td>Xuất báo cáo HTML tổng hợp các request/response và cảnh báo đã ghi nhận trong phiên kiểm thử.</td>
       </tr>
     </table>
@@ -465,7 +465,9 @@
     <h2>4. Các nhiệm vụ của bài thực hành</h2>
 
     <div class="box box-info">
-      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
+      Trước khi thực hiện bài thực hành sinh viên thực hiện chạy câu lệnh:<br />
+      <code>imodule https://raw.githubusercontent.com/thanhdat317/Imodule_labtainer/master/web-xxe.tar</code><br /><br />
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh:<br />
       <code>labtainer web-xxe</code>
     </div>
 
@@ -591,7 +593,7 @@
           Chức năng này sẽ cho phép gửi phản ánh kèm theo một tệp tin đính kèm.</p>
 
         <p><strong>Bước 4:</strong> Mở OWASP ZAP và bật <strong>Break</strong>. Khi Break được bật, mỗi yêu cầu
-          hoặc phản hồi sẽ tạm dừng để bạn quan sát. Sau khi kiểm tra xong, nhấn <strong>Continue</strong> để cho
+          hoặc phản hồi sẽ tạm dừng để sinh viên quan sát. Sau khi kiểm tra xong, nhấn <strong>Continue</strong> để cho
           phép yêu cầu hoặc phản hồi tiếp tục xử lý.</p>
 
         <p><strong>Bước 5:</strong> Tải lên tệp XML độc hại: nhập nội dung bất kỳ vào ô <strong>Message</strong>,
@@ -610,7 +612,8 @@
         </p>
 
         <p><strong>Bước 8:</strong> Kiểm tra với tệp thứ hai: thực hiện lại các bước từ Bước 5 đến Bước 7, nhưng
-          thay tệp tải lên bằng <code>evil2.xml</code>. So sánh kết quả thu được với lần thử sử dụng
+          thay tệp tải lên bằng <code>evil2.xml</code>. Sau đó thực hiện lưu phần Response Body và đặt tên tệp là
+          <code>evil2.raw</code>. So sánh kết quả thu được với lần thử sử dụng
           <code>evil1.xml</code> và xác định xem cả hai tệp có đều đọc được nội dung của <code>/etc/passwd</code>
           hay không.
         </p>
@@ -633,8 +636,8 @@
     <div class="task-block">
       <div class="task-header">Nhiệm vụ 5 - Khai thác XXE bằng tệp XML tùy chỉnh</div>
       <div class="task-body">
-        <p>Ở nhiệm vụ trước, bạn đã sử dụng các tệp XML được chuẩn bị sẵn để khai thác lỗ hổng XXE. Trong nhiệm vụ
-          này, bạn sẽ tự chỉnh sửa một tệp XML nhằm yêu cầu máy chủ đọc một tệp khác trên hệ thống.</p>
+        <p>Ở nhiệm vụ trước, sinh viên đã sử dụng các tệp XML được chuẩn bị sẵn để khai thác lỗ hổng XXE. Trong
+          nhiệm vụ này, sinh viên sẽ tự chỉnh sửa một tệp XML nhằm yêu cầu máy chủ đọc một tệp khác trên hệ thống.</p>
 
         <p><strong>Bước 1:</strong> Trên máy của sinh viên, mở tệp <code>evil3.xml</code>.</p>
         <p><strong>Bước 2:</strong> Quan sát cấu trúc của tệp và xác định phần khai báo External Entity (XXE).</p>
@@ -642,6 +645,11 @@
           đọc tệp <code>/opt/secret/flag.txt</code>.</p>
         <p><strong>Bước 4:</strong> Thực hiện lặp lại các bước như ở Nhiệm vụ 4 (Bước 2 đến Bước 7), lợi dụng tính
           năng Complaint bị lỗi để thực hiện đọc tệp theo yêu cầu.</p>
+
+        <p><strong>Bước 5:</strong> Lưu phản hồi: trong cửa sổ Break, nhấp chuột phải vào phản hồi, chọn
+          <strong>Save Raw</strong>, chỉ lưu phần Response Body và đặt tên tệp là <code>evil3.raw</code>. Sau khi
+          lưu xong, nhấn <strong>Continue</strong> để phản hồi được gửi về trình duyệt.
+        </p>
 
         <div class="box box-success">
           <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Chỉnh sửa thành công evil3.xml và đọc được nội dung tệp
@@ -662,7 +670,7 @@
       <div class="task-body">
         <p><strong>6.1 - Tạo báo cáo trong OWASP ZAP</strong></p>
         <p><strong>Bước 1:</strong> Trong OWASP ZAP, khi đã xác định được các lỗ hổng, vào mục
-          <strong>Application</strong>, chọn <strong>Report</strong> và chọn lưu báo cáo dạng HTML.
+          <strong>Report</strong> và chọn lưu báo cáo dạng HTML.
         </p>
         <p><strong>Bước 2:</strong> Lưu báo cáo vào thư mục chính (home) của máy tính web-xxe, đặt tên tệp là
           <code>report_zap</code>.

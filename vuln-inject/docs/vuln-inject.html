@@ -334,8 +334,7 @@
     <div class="header">
       <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
       <h1>HƯỚNG DẪN THỰC HÀNH</h1>
-      <div class="subtitle">Web Injection - Khai thác lỗ hổng SQL Injection, NoSQL Injection và Injection qua các
-        phương thức HTTP</div>
+      <div class="subtitle">Vuln Injection - Khai thác lỗ hổng SQL injection</div>
       <div class="meta">
         <span class="badge badge-protocol">Mức độ: Trung bình</span>
         <span class="badge badge-network">An toàn ứng dụng Web</span>
@@ -482,31 +481,33 @@
     <h2>4. Các nhiệm vụ của bài thực hành</h2>
 
     <div class="box box-info">
-      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
-      <code>labtainer web-inject</code>
+      Trước khi thực hiện bài thực hành sinh viên thực hiện chạy câu lệnh:<br />
+      <code>imodule https://raw.githubusercontent.com/thanhdat317/Imodule_labtainer/master/vuln-inject.tar</code><br /><br />
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh:<br />
+      <code>labtainer vuln-inject</code>
     </div>
 
     <h3>Tài khoản được cấu hình sẵn</h3>
     <table>
       <tr>
-        <th>Username</th>
-        <th style="width: 160px;">Password</th>
-        <th>Systems</th>
+        <th>Tài khoản</th>
+        <th style="width: 160px;">Mật khẩu</th>
+        <th>Hệ thống</th>
       </tr>
       <tr>
         <td><code>admin@juice.org</code></td>
         <td><code>admin123</code></td>
-        <td>Admin for web login</td>
+        <td>Tài khoản quản trị đăng nhập web</td>
       </tr>
       <tr>
         <td><code>jim@juice.org</code></td>
         <td><code>ncc-1701</code></td>
-        <td>web login</td>
+        <td>Đăng nhập web</td>
       </tr>
       <tr>
         <td><code>Ubuntu</code></td>
         <td><code>ubuntu</code></td>
-        <td>Student workstation, vulnerable server, Attacker workstation</td>
+        <td>Máy trạm sinh viên, máy chủ có lỗ hổng, máy trạm tấn công</td>
       </tr>
     </table>
 

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành aaa-ldap</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-easy {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .badge-network {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .badge-protocol {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+      white-space: nowrap;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd {
+      color: #89dceb;
+    }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body {
+      padding: 14px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    table code {
+      white-space: normal;
+      word-break: break-all;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 160px;
+    }
+
+    .topo-node .node-label {
+      font-size: 9.5pt;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .topo-node .node-ip {
+      font-size: 9.5pt;
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 15px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      color: #333;
+    }
+
+    .topo-arrow .arrow-line {
+      width: 100px;
+      height: 2px;
+      background: #27ae60;
+      position: relative;
+    }
+
+    .topo-arrow .arrow-line::after {
+      content: "";
+      position: absolute;
+      right: -1px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: #27ae60;
+    }
+
+    /* Sơ đồ dạng bus: client - đường trục dọc - server1/server2/ldap */
+    .topo-diagram.bus {
+      align-items: stretch;
+      gap: 0;
+      max-width: 660px;
+    }
+
+    .topo-node.client-node {
+      align-self: center;
+    }
+
+    .topo-vline-wrap {
+      display: flex;
+      align-items: center;
+      margin: 0 15px;
+    }
+
+    .topo-vline {
+      width: 2px;
+      align-self: stretch;
+      background: #27ae60;
+    }
+
+    .topo-branches {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 22px;
+    }
+
+    .topo-branch {
+      display: flex;
+      align-items: center;
+    }
+
+    .topo-branch .hline {
+      width: 36px;
+      height: 2px;
+      background: #27ae60;
+    }
+
+    .topo-branch .topo-node {
+      margin-left: 15px;
+      width: 190px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    .hl-green {
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    .hl-red {
+      color: #c62828;
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    .hl-yellow {
+      color: #f57f17;
+      font-weight: bold;
+    }
+
+    .hl-blue {
+      color: #1565c0;
+      font-weight: bold;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">aaa-ldap - Xác thực người dùng máy chủ Linux bằng dịch vụ LDAP</div>
+      <div class="meta">
+        <span class="badge badge-easy">Mức độ: Dễ</span>
+        <span class="badge badge-network">An toàn hệ điều hành</span>
+        <span class="badge badge-protocol">Hệ điều hành Windows/Linux</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+
+    <table>
+      <tr>
+        <th style="width: 220px;">Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td><strong>Tên Lab</strong></td>
+        <td><code>aaa-ldap</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mức độ</strong></td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td><strong>Công cụ sử dụng</strong></td>
+        <td><code>ldapsearch</code>, <code>ldapadd</code>, <code>ldappasswd</code>, <code>wireshark</code>,
+          <code>ssh</code>
+        </td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <ul>
+      <li>Hiểu được khái niệm, vai trò của dịch vụ thư mục Lightweight Directory Access Protocol (LDAP) trong xác thực
+        người dùng tập trung.</li>
+      <li>Biết cách khai báo và đăng nhập người dùng từ xa qua PAM LDAP (Pluggable Authentication Modules).</li>
+      <li>Sử dụng Wireshark để phân tích giao thức LDAP và phát hiện rủi ro bảo mật truyền mật khẩu dưới dạng văn bản
+        thuần.</li>
+      <li>Tạo và quản lý các đối tượng người dùng, nhóm trong cơ sở dữ liệu LDAP thông qua các tệp LDIF (LDAP Data
+        Interchange Format).</li>
+      <li>Cấu hình truyền dữ liệu an toàn LDAPS (LDAP qua SSL/TLS) để mã hóa toàn bộ dữ liệu trao đổi trong mạng.</li>
+    </ul>
+
+    <h3>Kỹ năng đạt được</h3>
+    <ul>
+      <li>Sử dụng thành thạo các công cụ dòng lệnh truy vấn và quản trị LDAP cơ bản (<code>ldapsearch</code>,
+        <code>ldapadd</code>, <code>ldappasswd</code>).
+      </li>
+      <li>Sử dụng Wireshark để bắt lưu lượng mạng, lọc bản tin và phát hiện dữ liệu nhạy cảm truyền không mã hóa.</li>
+      <li>Xây dựng cấu trúc tệp LDIF để thêm mới người dùng, nhóm và cập nhật dữ liệu thư mục LDAP tập trung.</li>
+      <li>Cấu hình tệp tin PAM LDAP và thư viện hệ thống để thiết lập xác thực an toàn qua giao thức mã hóa LDAPS.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+
+    <p><strong>Tình huống:</strong><br />
+      Trong mạng doanh nghiệp, để tránh việc phải tạo tài khoản người dùng thủ công trên từng máy chủ Linux, Quản trị
+      viên sử dụng giải pháp xác thực tập trung LDAP.
+      Toàn bộ thông tin tài khoản (username, password, group ID, home directory) được lưu trữ tập trung tại máy chủ LDAP
+      Server.
+      Các máy chủ Linux dịch vụ bao gồm <code>server1</code> và <code>server2</code> sẽ truy vấn LDAP Server để kiểm tra
+      thông tin đăng nhập khi có người dùng kết nối qua SSH.
+    </p>
+
+    <p><strong>Vai trò của sinh viên:</strong></p>
+    <ul>
+      <li>Đóng vai trò là Quản trị viên hệ thống để kiểm tra kết nối SSH, đổi mật khẩu tài khoản người dùng và xác thực
+        cơ chế lưu trữ tài khoản tập trung thông qua dịch vụ PAM LDAP.</li>
+      <li>Sử dụng công cụ Wireshark để giám sát mạng, bắt các gói tin xác thực LDAP và phân tích rủi ro bảo mật truyền
+        mật khẩu dạng văn bản rõ.</li>
+      <li>Biên soạn và cấu hình các tệp tin LDIF định nghĩa nhóm (<code>qa.ldif</code>) và người dùng mới
+        (<code>mary.ldif</code>) rồi nạp vào cơ sở dữ liệu LDAP.</li>
+      <li>Thực hiện cấu hình kích hoạt giao thức an toàn LDAPS (LDAP qua SSL/TLS) trên các máy chủ dịch vụ để mã hóa
+        toàn bộ dữ liệu trao đổi trong mạng.</li>
+    </ul>
+
+    <h3>Sơ đồ mạng</h3>
+
+    <div class="topology">
+      <div class="topo-diagram bus">
+        <div class="topo-node client-node">
+          <div>client</div>
+          <div class="node-label">Máy trạm sinh viên</div>
+          <div class="node-ip">172.25.0.3</div>
+        </div>
+
+        <div class="topo-vline-wrap">
+          <div class="topo-vline"></div>
+        </div>
+
+        <div class="topo-branches">
+          <div class="topo-branch">
+            <div class="hline"></div>
+            <div class="topo-node">
+              <div>server1</div>
+              <div class="node-label">Máy chủ dịch vụ 1</div>
+              <div class="node-ip">172.25.0.4</div>
+            </div>
+          </div>
+
+          <div class="topo-branch">
+            <div class="hline"></div>
+            <div class="topo-node">
+              <div>server2</div>
+              <div class="node-label">Máy chủ dịch vụ 2</div>
+              <div class="node-ip">172.25.0.5</div>
+            </div>
+          </div>
+
+          <div class="topo-branch">
+            <div class="hline"></div>
+            <div class="topo-node">
+              <div>ldap</div>
+              <div class="node-label">Máy chủ thư mục LDAP</div>
+              <div class="node-ip">172.25.0.2</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>Dịch vụ thư mục LDAP (Lightweight Directory Access Protocol)</h3>
+    <p>LDAP là giao thức dạng client-server dùng để truy cập và quản lý dịch vụ thông tin thư mục tập trung qua mạng IP.
+      Dữ liệu trong cơ sở dữ liệu LDAP được sắp xếp dưới dạng cấu trúc cây phân cấp (Directory Information Tree - DIT)
+      với các nút đại diện cho các đối tượng (như người dùng, nhóm thiết bị). Mỗi đối tượng được xác định duy nhất bằng
+      một Tên phân biệt (Distinguished Name - DN), bao gồm các thuộc tính thành phần như <code>uid</code> (User ID),
+      <code>ou</code> (Organizational Unit), và <code>dc</code> (Domain Component).
+    </p>
+
+    <h3>Tệp định dạng dữ liệu LDIF (LDAP Data Interchange Format)</h3>
+    <p>LDIF là định dạng văn bản thuần tiêu chuẩn được sử dụng để biểu diễn các thư mục đối tượng LDAP và các lệnh thực
+      hiện cập nhật (thêm, sửa, xóa) cơ sở dữ liệu thư mục. Mỗi khối thông tin trong tệp LDIF được phân tách bằng một
+      dòng trống và chứa các dòng thuộc tính theo dạng <code>thuộc_tính: giá_trị</code>.</p>
+
+    <h3>Bảo mật trong truyền tin LDAP (LDAP vs LDAPS)</h3>
+    <p>Theo mặc định, giao thức LDAP hoạt động qua cổng <code>389</code> (không mã hóa), khiến cho toàn bộ thông tin
+      đăng nhập bao gồm cả mật khẩu người dùng bị truyền đi dưới dạng văn bản rõ trên mạng. Để đảm bảo an toàn thông
+      tin, giao thức LDAPS (LDAP qua SSL/TLS) hoạt động qua cổng <code>636</code> được triển khai nhằm mã hóa toàn bộ
+      lưu lượng trao đổi, ngăn chặn rủi ro nghe lén dữ liệu trên đường truyền mạng.</p>
+
+    <h3>Các tệp cấu hình chính của dịch vụ LDAP</h3>
+    <table>
+      <tr>
+        <th style="width: 240px;">Đường dẫn tệp</th>
+        <th>Mô tả chức năng</th>
+      </tr>
+      <tr>
+        <td><code>/etc/ldap/ldap.conf</code></td>
+        <td>Tệp cấu hình client LDAP toàn cục của hệ thống, thiết lập các tham số như URI của LDAP Server và chính sách
+          chứng chỉ SSL.</td>
+      </tr>
+      <tr>
+        <td><code>/etc/ldap.conf</code></td>
+        <td>Tệp cấu hình của thư viện xác thực PAM LDAP, xác định URI máy chủ thư mục, Base DN và các tùy chọn mã hóa
+          SSL/TLS cho tiến trình đăng nhập.</td>
+      </tr>
+      <tr>
+        <td><code>/etc/nsswitch.conf</code></td>
+        <td>Tệp cấu hình dịch vụ chuyển đổi tên dịch vụ (Name Service Switch), chỉ định thứ tự tìm kiếm tài khoản hệ
+          thống (ví dụ: tìm cục bộ trước, sau đó truy vấn qua LDAP).</td>
+      </tr>
+    </table>
+
+    <h3>Bảng tùy chọn và cú pháp công cụ sử dụng trong bài</h3>
+    <table>
+      <tr>
+        <th style="width: 150px;">Công cụ</th>
+        <th style="width: 280px;">Tùy chọn / Cú pháp</th>
+        <th>Mô tả tác dụng</th>
+      </tr>
+      <tr>
+        <td><code>ldapsearch</code></td>
+        <td><code>ldapsearch -x</code></td>
+        <td>Truy vấn và tìm kiếm các đối tượng trong cơ sở dữ liệu LDAP bằng xác thực đơn giản.</td>
+      </tr>
+      <tr>
+        <td><code>ldapadd</code></td>
+        <td><code>ldapadd -x -W -D &lt;binddn&gt; -f &lt;file.ldif&gt;</code></td>
+        <td>Thêm mới các đối tượng người dùng hoặc nhóm từ tệp tin LDIF vào máy chủ LDAP.</td>
+      </tr>
+      <tr>
+        <td><code>ldappasswd</code></td>
+        <td><code>ldappasswd -s &lt;mật_khẩu&gt; -W -D &lt;binddn&gt; -x &lt;userdn&gt;</code></td>
+        <td>Thiết lập hoặc thay đổi mật khẩu của một tài khoản người dùng cụ thể trên LDAP Server.</td>
+      </tr>
+      <tr>
+        <td><code>wireshark</code></td>
+        <td><code>wireshark &amp;</code></td>
+        <td>Khởi chạy công cụ Wireshark dưới nền hệ điều hành để bắt và phân tích gói tin mạng.</td>
+      </tr>
+      <tr>
+        <td><code>ssh</code></td>
+        <td><code>ssh &lt;user&gt;@&lt;host&gt;</code></td>
+        <td>Kết nối và quản trị từ xa an toàn tới máy chủ đích qua giao thức SSH.</td>
+      </tr>
+    </table>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+    <div class="box box-info">
+      Trước khi thực hiện bài thực hành sinh viên thực hiện chạy câu lệnh:<br />
+      <code>imodule https://raw.githubusercontent.com/thanhdat317/Imodule_labtainer/master/aaa-ldap.tar</code><br /><br />
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh:<br />
+      <code>labtainer aaa-ldap</code>
+    </div>
+
+    <p>Sau khi khởi động xong, ba terminal ảo sẽ xuất hiện: một terminal đại diện cho máy chủ thư mục
+      <code>ldap</code>, một terminal đại diện cho máy trạm <code>client</code> và một terminal đại diện cho máy chủ
+      dịch vụ <code>server1</code>.
+    </p>
+
+    <!-- TASK 1 -->
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 - Tìm hiểu LDAP và thay đổi mật khẩu tài khoản mike qua SSH tới
+        Server1</div>
+      <div class="task-body">
+        <p>Sinh viên thực hiện kiểm tra cơ sở dữ liệu LDAP ban đầu, kích hoạt bắt gói tin Wireshark và thực hiện đăng
+          nhập SSH lần đầu dưới quyền người dùng LDAP.</p>
+
+        <p><strong>Bước 1:</strong> Trên terminal máy <code>ldap</code>, sinh viên chạy câu lệnh truy vấn cấu trúc thư
+          mục để kiểm tra danh sách tài khoản hiện có trong hệ thống thư mục tập trung:</p>
+        <pre><span class="cmd">ldapsearch -x | less</span></pre>
+        <p>Sinh viên nhấn phím mũi tên để cuộn, quan sát sự xuất hiện của đối tượng người dùng <code>uid=mike</code> và
+          nhóm <code>cn=projx</code>, sau đó nhấn phím <code>q</code> để thoát.</p>
+
+        <p><strong>Bước 2:</strong> Khởi động công cụ giám sát Wireshark trên máy <code>ldap</code> để bắt đầu theo dõi
+          các gói tin mạng:</p>
+        <pre><span class="cmd">wireshark &</span></pre>
+        <p>Sau khi giao diện đồ họa Wireshark xuất hiện, sinh viên chọn card mạng <code>eth0</code> và nhấn vào biểu
+          tượng vây cá mập màu xanh để tiến hành bắt các gói tin.</p>
+
+        <p><strong>Bước 3:</strong> Chuyển sang máy <code>client</code> và thực hiện kết nối SSH tới máy chủ
+          <code>server1</code> dưới quyền người dùng <code>mike</code> với mật khẩu khởi tạo là
+          <code>password123</code>:
+        </p>
+        <pre><span class="cmd">ssh mike@server1</span></pre>
+        <div class="box box-warning">
+          <strong>Lưu ý:</strong> Hệ thống sẽ bắt buộc thay đổi mật khẩu ngay trong lần đăng nhập đầu tiên. Sinh viên
+          hãy nhập mật khẩu hiện tại (<code>password123</code>) rồi điền mật khẩu mới của mình (cần ghi nhớ mật khẩu mới
+          này).
+        </div>
+
+        <p><strong>Bước 4:</strong> Sau khi phiên SSH cũ tự động đóng lại, thực hiện đăng nhập lại bằng mật khẩu mới và
+          kiểm tra cơ chế lưu trữ tài khoản của máy chủ dịch vụ:</p>
+        <pre><span class="cmd">ssh mike@server1</span>
+<span class="cmd">id</span>
+<span class="cmd">cat /etc/passwd | grep mike</span></pre>
+        <p>Sinh viên chú ý quan sát xem thông tin tài khoản của <code>mike</code> có được lưu trữ trong tệp tin cấu
+          hình tài khoản cục bộ <code>/etc/passwd</code> của <code>server1</code> hay không.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Thực hiện kết nối SSH thành công dưới quyền <code>mike</code>
+          tới máy <code>server1</code> và hoàn tất đổi mật khẩu.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong> Dịch vụ LDAP là gì? Tại sao khi đăng nhập thành công vào <code>server1</code> dưới
+          quyền người dùng <code>mike</code>, sinh viên lại không thấy thông tin của <code>mike</code> trong tệp tin
+          <code>/etc/passwd</code> cục bộ của <code>server1</code>?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK 2 -->
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 - Phân tích lưu lượng LDAP trên Wireshark và xuất gói tin đổi
+        mật khẩu</div>
+      <div class="task-body">
+        <p>Sinh viên thực hiện lọc tìm gói tin đổi mật khẩu của người dùng và trích xuất ra tệp tin pcapng riêng biệt.
+        </p>
+
+        <p><strong>Bước 1:</strong> Quay lại giao diện Wireshark trên máy <code>ldap</code>, sinh viên nhấn nút dừng bắt
+          gói tin (biểu tượng hình vuông màu đỏ), sau đó nhập cụm từ <span class="hl-yellow">ldap</span> vào ô lọc và
+          nhấn
+          Enter để hiển thị các gói tin liên quan.</p>
+
+        <p><strong>Bước 2:</strong> Tìm kiếm và lựa chọn gói tin <code>modifyRequest</code> có chứa trường dữ liệu
+          <code>userPassword</code> đại diện cho thao tác thay đổi mật khẩu vừa thực hiện của người dùng
+          <code>mike</code>.
+        </p>
+
+        <p><strong>Bước 3:</strong> Trích xuất riêng gói tin vừa chọn ra tệp tin bằng cách vào <strong>File</strong>
+          &rarr; <strong>Export Specified Packets...</strong>, sau đó đặt tên tệp là <code>password.pcapng</code> và lưu
+          ý tích chọn <strong>Selected packet only</strong> trước khi nhấn
+          <strong>Save</strong>.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Tạo thành công tệp tin
+          <code>/home/admin/password.pcapng</code> chỉ chứa gói tin đổi mật khẩu được chọn.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong> Tại sao tệp tin <code>password.pcapng</code> chỉ nên chứa gói tin đã chọn
+          (Selected packet only) thay vì toàn bộ lưu lượng đã bắt? Giải thích cách tìm gói tin đổi mật khẩu trong
+          Wireshark.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK 3 -->
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 - Sử dụng tài khoản mike truy cập SSH tới Server2 bằng mật khẩu
+        mới</div>
+      <div class="task-body">
+        <p>Sinh viên thực hiện kiểm chứng khả năng đồng bộ mật khẩu tức thời trên máy chủ Linux thứ hai.</p>
+
+        <p><strong>Bước 1:</strong> Trên cửa sổ terminal đang kết nối SSH với <code>server1</code>, gõ lệnh thoát để
+          quay về máy trạm.
+
+        <p><strong>Bước 2:</strong> Từ máy <code>client</code>, thực hiện kết nối SSH tới máy chủ thứ hai
+          <code>server2</code> bằng tài khoản <code>mike</code> và mật khẩu mới vừa thay đổi:
+        </p>
+        <pre><span class="cmd">ssh mike@server2</span></pre>
+        <p>Sinh viên xác minh xem tài khoản có thể đăng nhập thành công ngay lập tức mà không cần đổi lại mật khẩu hay
+          không</p>
+
+        <p><strong>Bước 3:</strong> Gõ lệnh thoát để đóng kết nối SSH với máy chủ <code>server2</code>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Đăng nhập thành công tài khoản <code>mike</code> vào
+          <code>server2</code> bằng mật khẩu mới thông qua SSH.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong> Tại sao người dùng <code>mike</code> có thể sử dụng mật khẩu mới vừa thay đổi trên
+          <code>server1</code> để đăng nhập ngay lập tức vào <code>server2</code>? Giải thích lợi ích của cơ chế xác
+          thực tập trung.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK 4 -->
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 4 - Thêm nhóm và người dùng mary trên LDAP Server, đăng nhập SSH
+        tới Server1</div>
+      <div class="task-body">
+        <p>Sinh viên thực hiện định nghĩa nhóm và người dùng mới bằng tệp LDIF, nạp vào cơ sở dữ liệu LDAP và kiểm tra
+          đăng nhập tới máy chủ Server1.</p>
+
+        <p><strong>Bước 1:</strong> Trên terminal máy <code>ldap</code>, mở trình soạn thảo để tạo tệp tin định nghĩa
+          nhóm mới <code>qa.ldif</code>:</p>
+        <pre><span class="cmd">nano qa.ldif</span></pre>
+
+        <p><strong>Bước 2:</strong> Tiếp tục tạo tệp tin định nghĩa thông tin người dùng mới <code>mary.ldif</code>
+          thuộc nhóm <code>qa</code>:</p>
+        <pre><span class="cmd">nano mary.ldif</span></pre>
+
+        <p><strong>Bước 3:</strong> Chạy các câu lệnh nạp dữ liệu nhóm và người dùng vừa tạo vào máy chủ LDAP (nhập mật
+          khẩu quản trị viên LDAP là <span class="hl-yellow">adminpass</span> khi hệ thống yêu cầu):</p>
+        <pre><span class="cmd">ldapadd -x -W -D "cn=admin,dc=example,dc=com" -f qa.ldif</span>
+<span class="cmd">ldapadd -x -W -D "cn=admin,dc=example,dc=com" -f mary.ldif</span></pre>
+
+        <p><strong>Bước 4:</strong> Thiết lập mật khẩu khởi tạo mặc định là <code>password123</code> cho tài khoản của
+          <code>mary</code> (nhập mật khẩu admin LDAP là <span class="hl-yellow">adminpass</span>):
+        </p>
+        <pre><span class="cmd">ldappasswd -s password123 -W -D "cn=admin,dc=example,dc=com" -x "uid=mary,ou=users,dc=example,dc=com"</span></pre>
+
+        <p><strong>Bước 5:</strong> Chuyển sang máy <code>client</code>, thực hiện kết nối SSH tới <code>server1</code>
+          bằng tài khoản <code>mary</code>, đổi mật khẩu mới theo yêu cầu bắt buộc và gõ lệnh thoát:</p>
+        <pre><span class="cmd">ssh mary@server1</span></pre>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Tạo thành công tài khoản và nhóm trong LDAP, đồng thời thực
+          hiện đăng nhập và đổi mật khẩu thành công cho <code>mary</code> trên máy <code>server1</code>.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 4:</strong> Tệp tin định dạng <code>.ldif</code> đóng vai trò gì trong việc quản lý cơ sở dữ
+          liệu LDAP? Giải thích ý nghĩa của các trường <code>uidNumber</code> và <code>gidNumber</code> khi thêm một
+          người dùng mới.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK 5 -->
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 5 - Đăng nhập SSH tới Server2 với tài khoản mary và cấu hình mã
+        hóa dữ liệu truyền tin LDAP</div>
+      <div class="task-body">
+        <p>Sinh viên thực hiện kiểm tra đăng nhập tài khoản <code>mary</code> trên máy chủ thứ hai và tiến hành cấu hình
+          bảo mật mã hóa truyền tin LDAP (LDAPS) để chống nghe lén thông tin mật khẩu.</p>
+
+        <p><strong>Bước 1:</strong> Từ máy <code>client</code>, thực hiện kết nối SSH tới <code>server2</code> bằng tài
+          khoản <code>mary</code> và mật khẩu mới đổi, sau đó gõ <code>exit</code> để thoát:</p>
+        <pre><span class="cmd">ssh mary@server2</span></pre>
+
+        <p><strong>Bước 2:</strong> Quay lại giao diện Wireshark trên máy <code>ldap</code>, nhập bộ lọc hiển thị
+          <code>ldap.bindRequest_element</code> để nhận diện rủi ro bảo mật:
+        </p>
+        <p>Sinh viên chú ý quan sát gói tin Bind Request để thấy rõ thông tin mật khẩu người dùng bị truyền đi dưới
+          dạng văn bản rõ không mã hóa.</p>
+
+        <p><strong>Bước 3:</strong> Nhấn vào biểu tượng vây cá mập màu xanh trên Wireshark để khởi động lại tiến trình
+          bắt gói tin và xóa bộ lọc cũ.</p>
+
+        <p><strong>Bước 4:</strong> Thực hiện chỉnh sửa cấu hình sử dụng giao thức bảo mật SSL/TLS trên cả hai máy
+          <code>server1</code> và <code>server2</code> dưới quyền root:
+        </p>
+        <p>Mở tệp tin cấu hình PAM LDAP:</p>
+        <pre><span class="cmd">sudo nano /etc/ldap.conf</span></pre>
+        <p>Nội dung thay đổi trong tệp cấu hình <code>/etc/ldap.conf</code>:</p>
+        <pre>Thay thế: uri ldap://ldap &rarr; uri ldaps://ldap
+Bỏ dấu chú thích dòng: #ssl on &rarr; ssl on</pre>
+
+        <p>Tiếp tục mở tệp tin cấu hình thư viện LDAP:</p>
+        <pre><span class="cmd">sudo nano /etc/ldap/ldap.conf</span></pre>
+        <p>Thêm dòng sau vào cuối tệp tin <code>/etc/ldap/ldap.conf</code> để bỏ qua lỗi kiểm tra chứng chỉ:</p>
+        <pre>TLS_REQCERT allow</pre>
+        <p>Sau khi hoàn tất chỉnh sửa, sinh viên lưu và đóng cả hai tệp tin cấu hình trên cả hai máy chủ.</p>
+
+        <p><strong>Bước 5:</strong> Thực hiện kết nối SSH lại tài khoản <code>mary</code> từ máy <code>client</code>,
+          đồng thời kiểm tra trên Wireshark để xác nhận lưu lượng trao đổi đã chuyển sang mã hóa TLS/SSL:</p>
+        <pre><span class="cmd">ssh mary@server1</span></pre>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Đăng nhập thành công tài khoản <code>mary</code> vào
+          <code>server2</code> bằng mật khẩu mới, đồng thời cấu hình thành công giao thức <code>ldaps://</code> để mã
+          hóa an toàn dữ liệu trao đổi xác thực.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 5:</strong><br />
+          Phân biệt sự khác nhau giữa cách xác thực người dùng bằng cơ chế file cục bộ (<code>/etc/passwd</code>,
+          <code>/etc/shadow</code>) và cơ chế truy vấn từ xa qua LDAP. Sự khác biệt giữa <code>ldap://</code> và
+          <code>ldaps://</code> là gì?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+      <p style="margin-top: 4px;">Bài thực hành này được chỉnh sửa và biên soạn từ bài &ldquo;ldap&rdquo; trong hệ
+        thống Labtainer của Trung tâm An ninh mạng và Tác chiến không gian mạng, Trường Sau đại học Hải quân Hoa Kỳ.</p>
+    </div>
+
+  </div>
+</body>
+
+</html>

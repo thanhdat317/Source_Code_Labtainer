@@ -475,7 +475,9 @@
     <h2>4. Các nhiệm vụ của bài thực hành</h2>
 
     <div class="box box-info">
-      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
+      Trước khi thực hiện bài thực hành sinh viên thực hiện chạy câu lệnh:<br />
+      <code>imodule https://raw.githubusercontent.com/thanhdat317/Imodule_labtainer/master/web-insdes.tar</code><br /><br />
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh:<br />
       <code>labtainer web-insdes</code>
     </div>
 
@@ -499,26 +501,17 @@
       <tr>
         <td><code>Ubuntu</code></td>
         <td><code>ubuntu</code></td>
-        <td>Máy trạm sinh viên</td>
-      </tr>
-      <tr>
-        <td><code>Ubuntu</code></td>
-        <td><code>ubuntu</code></td>
-        <td>Máy chủ chứa lỗ hổng</td>
+        <td>Máy trạm sinh viên và máy chủ chứa lỗ hổng</td>
       </tr>
     </table>
 
     <div class="task-block">
-      <div class="task-header">Nhiệm vụ 1 - Kiểm tra kết nối giữa máy trạm của sinh viên và máy chủ web</div>
+      <div class="task-header">Nhiệm vụ 1 - Kiểm tra kết nối tới máy chủ web</div>
       <div class="task-body">
-        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên (web-insdes), sử dụng lệnh
-          <code>ping</code> để xác nhận kết nối tới máy chủ web:
-        </p>
-        <pre><span class="cmd">ping 192.168.99.100</span></pre>
+        <p>Tại giao diện dòng lệnh máy sinh viên (<code>web-insdes</code>) thực hiện kiểm tra kết nối tới máy chủ web.</p>
 
         <div class="box box-success">
-          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Nhận được phản hồi từ địa chỉ
-          <code>192.168.99.100</code>, xác nhận máy trạm và máy chủ web có thể liên lạc được với nhau.
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Nhận được phản hồi từ máy chủ web, xác nhận máy trạm và máy chủ web có thể liên lạc được với nhau.
         </div>
       </div>
     </div>
@@ -614,7 +607,7 @@
         </p>
 
         <p><strong>Bước 2:</strong> Sau khi quét hoàn tất, quan sát danh sách đường dẫn được tìm thấy và trả lời
-          câu hỏi: sinh viên có thấy bất kỳ liên kết nào đến tài liệu API hoặc các thư mục ẩn không?</p>
+          câu hỏi: sinh viên có thấy liên kết api-docs hay endpoint ẩn nào khác không?</p>
 
         <p><strong>Bước 3:</strong> Lưu kết quả quét dưới dạng báo cáo HTML, lưu tại Desktop với tên
           <code>traversal.html</code>. Trường hợp không có tùy chọn Traversal, hãy lưu toàn bộ báo cáo.
@@ -637,10 +630,9 @@
     <div class="task-block">
       <div class="task-header">Nhiệm vụ 6 - Khai thác Insecure Deserialization để thực thi mã từ xa (RCE)</div>
       <div class="task-body">
-        <p><strong>Mục tiêu:</strong> Sinh viên tìm cách khiến máy chủ thực thi mã ngoài ý muốn bằng cách gửi dữ
-          liệu độc hại qua yêu cầu POST dạng JSON, theo tiêu chuẩn OWASP WSTG 4.7.11.2 để kiểm tra hai lỗ hổng
-          Remote File Inclusion và Code Inclusion. Nguyên nhân gốc rễ là ứng dụng không kiểm tra kỹ dữ liệu đầu
-          vào khi nạp tệp động, tạo cơ hội cho kẻ tấn công chèn mã độc và chiếm quyền điều khiển hệ thống.</p>
+        <p><strong>6.1 - Khai thác Insecure Deserialization để thực thi mã từ xa (RCE)</strong></p>
+
+        <p><strong>Mục tiêu:</strong> Sinh viên khai thác lỗ hổng Insecure Deserialization bằng cách gửi dữ liệu JSON độc hại qua yêu cầu POST, từ đó kiểm tra xem máy chủ có thực thi mã ngoài ý muốn hay không. Lỗ hổng xuất hiện do ứng dụng không kiểm tra và xử lý an toàn dữ liệu đầu vào trước khi thực thi, tạo điều kiện cho kẻ tấn công chèn mã độc, gây ảnh hưởng đến hoạt động của hệ thống hoặc chiếm quyền điều khiển máy chủ.</p>
 
         <p><strong>Bước 1:</strong> Mở trình duyệt và truy cập:
           <code>https://192.168.99.100:3000/api-docs</code>. Đây là tài liệu mô tả các API của ứng dụng. Trong
@@ -735,6 +727,10 @@
           Pug lợi dụng đối tượng <code>global.process</code> của Node.js để gọi các hàm đọc file của hệ thống,
           sau đó nhập biểu thức đó vào ô tên người dùng và nhấn <strong>Set Username</strong> để quan sát
           nội dung tệp flag được trả về.</p>
+        <div class="box box-info">
+          <strong>Gợi ý cú pháp payload:</strong><br />
+          <code>#{global.process.mainModule.require('fs').readFileSync('/&lt;tenfile&gt;')}</code>
+        </div>
 
         <div class="box box-success">
           <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác minh thành công lỗ hổng SSTI trên trang hồ sơ và

@@ -395,11 +395,12 @@
     </tbody>
   </table>
   <h2>4. Các nhiệm vụ của bài thực hành</h2>
-  <div class="box box-info">Để khởi động bài thực hành, sinh viên dùng câu lệnh: 
-    <br>
-    <code>labtainer web-brokenaccess</code> 
-    <br>Lưu ý: sinh viên sử dụng mã sinh viên của mình làm tên tài khoản khi được yêu cầu nhập email tại giao diện dòng lệnh, thông tin này được dùng phục vụ chấm điểm.
-  </div>
+  <div class="box box-info">
+      Trước khi thực hiện bài thực hành sinh viên thực hiện chạy câu lệnh:<br />
+      <code>imodule https://raw.githubusercontent.com/thanhdat317/Imodule_labtainer/master/web-brokenaccess.tar</code><br /><br />
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh:<br />
+      <code>labtainer web-brokenaccess</code>
+    </div>
   <h3>Tài khoản được cấu hình sẵn</h3>
   <table>
     <tbody>
@@ -513,7 +514,7 @@
       </p>
       <p>
         <strong>Bước 3:</strong> Trong mục 
-        <strong>Proxy Network</strong>, chọn 
+        <strong>Network Proxy</strong>, chọn 
         <strong>Settings</strong>.
       </p>
       <p>
@@ -527,7 +528,7 @@
       </p>
       <p>
         <strong>Bước 6:</strong> Chọn thêm 
-        <strong>Also use this proxy for HTTPS</strong> (Sử dụng máy chủ proxy này cho tất cả các giao thức).
+        <strong>Use this proxy server for all protocols</strong> (Sử dụng máy chủ proxy này cho tất cả các giao thức).
       </p>
       <p>
         <strong>Bước 7:</strong> Chọn 
@@ -614,8 +615,9 @@
         <strong>Bước 3:</strong> Tại tab 
         <strong>Sites</strong>, tìm đường dẫn 
         <code>http://192.168.99.100:3000</code> → 
+        <code>api</code> → 
         <code>user</code> → 
-        <code>POST:Login</code>. Chọn chuột phải, chọn 
+        <code>POST:User</code>. Chọn chuột phải, chọn 
         <strong>Open/Resend with Request Editor</strong>.
       </p>
       <p>
@@ -633,7 +635,13 @@
         <strong>Send</strong> để gửi yêu cầu tạo tài khoản.
       </p>
       <p>
-        <strong>Bước 6:</strong> Đăng nhập bằng tài khoản vừa tạo và truy cập đường dẫn sau để xác minh tài khoản có quyền quản trị viên hay không:
+        <strong>Bước 6:</strong> Trong thanh địa chỉ của Firefox, truy cập URL sau để xem thông tin tài khoản mới thêm vào đã cập nhật:
+      </p>
+      <div class="box box-info">
+        <code>http://192.168.99.100:3000/rest/products/search?q=qwert')) UNION SELECT id, email, password, '4', '5', '6','7', '8', '9' FROM Users--</code>
+      </div>
+      <p>
+        <strong>Bước 7:</strong> Đăng nhập bằng tài khoản vừa tạo và truy cập đường dẫn sau để xác minh tài khoản có quyền quản trị viên hay không:
       </p>
       <div class="box box-info">
         <code>https://192.168.99.100:3000/#/administration</code>
