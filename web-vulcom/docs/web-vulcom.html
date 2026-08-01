@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hướng dẫn thực hành - Web vulcom</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 13pt;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background: #f4f6f9;
+      padding: 30px 20px;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 50px 60px;
+      border: 1px solid #d0d5dd;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .header .institution {
+      font-size: 11pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header h1 {
+      font-size: 20pt;
+      color: #003087;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 13pt;
+      color: #444;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .header .meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 10pt;
+      font-weight: bold;
+    }
+
+    .badge-easy {
+      background: #e8f5e9;
+      color: #216e39;
+      border: 1px solid #b7dfc4;
+    }
+
+    .badge-network {
+      background: #d9ecff;
+      color: #0b4f8a;
+      border: 1px solid #a9d1f7;
+    }
+
+    .badge-protocol {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    h2 {
+      font-size: 14pt;
+      color: #003087;
+      border-left: 5px solid #003087;
+      padding-left: 10px;
+      margin: 32px 0 12px;
+      font-weight: bold;
+    }
+
+    h3 {
+      font-size: 12.5pt;
+      color: #1a5276;
+      margin: 20px 0 8px;
+      font-weight: bold;
+    }
+
+    h4 {
+      font-size: 12pt;
+      color: #2e4053;
+      margin: 16px 0 6px;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 10px 24px;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    code {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      color: #b03a2e;
+    }
+
+    pre {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "Courier New", monospace;
+      font-size: 10.5pt;
+      overflow-x: auto;
+      margin: 10px 0 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    pre .cmd {
+      color: #89dceb;
+    }
+
+    pre .comment {
+      color: #8b93a8;
+      font-style: italic;
+    }
+
+    .box {
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    .box-info {
+      background: #e8f4fd;
+      border-left: 5px solid #2196f3;
+    }
+
+    .box-warning {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+    }
+
+    .box-danger {
+      background: #fdecea;
+      border-left: 5px solid #f44336;
+    }
+
+    .box-success {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+    }
+
+    .box strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .topology {
+      text-align: center;
+      margin: 18px 0;
+    }
+
+    .topo-diagram {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      background: #f8fafc;
+      border: 1px solid #cdd0d8;
+      border-radius: 10px;
+      padding: 24px 32px;
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+    }
+
+    .topo-node {
+      background: #003087;
+      color: #fff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      text-align: center;
+      min-width: 180px;
+    }
+
+    .topo-node .node-label {
+      font-size: 10pt;
+      opacity: 0.9;
+    }
+
+    .topo-node .node-ip {
+      font-size: 9pt;
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    .topo-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 20px;
+      gap: 8px;
+    }
+
+    .topo-arrow .arrow-label {
+      font-size: 9.5pt;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .topo-arrow .arrow-line {
+      width: 120px;
+      height: 2px;
+      background: #27ae60;
+    }
+
+    .task-block {
+      border: 1px solid #b0c4de;
+      border-radius: 8px;
+      margin: 18px 0;
+      overflow: hidden;
+    }
+
+    .task-header {
+      background: #003087;
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 12.5pt;
+      font-weight: bold;
+    }
+
+    .task-body {
+      padding: 14px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12pt;
+    }
+
+    th {
+      background: #003087;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 9px 12px;
+      border: 1px solid #d0d5dd;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f5f7fa;
+    }
+
+    .task-group {
+      margin: 18px 0;
+    }
+
+    .task-group-title {
+      font-size: 12.5pt;
+      color: #003087;
+      font-weight: bold;
+      padding: 8px 0 4px 4px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid #d0d5dd;
+      padding-top: 14px;
+      text-align: center;
+      font-size: 10pt;
+      color: #777;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        border: none;
+        box-shadow: none;
+        padding: 30px 40px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="institution">Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</div>
+      <h1>HƯỚNG DẪN THỰC HÀNH</h1>
+      <div class="subtitle">Web Vulcom - Khai thác lỗ hổng OWASP Vulnerable and Outdated Components</div>
+      <div class="meta">
+        <span class="badge badge-protocol">Mức độ: Trung bình</span>
+        <span class="badge badge-network">An toàn ứng dụng Web</span>
+        <span class="badge badge-easy">Kiểm thử xâm nhập</span>
+      </div>
+    </div>
+
+    <h2>1. Giới thiệu Lab</h2>
+
+    <table>
+      <tr>
+        <th style="width: 220px;">Thông tin</th>
+        <th>Chi tiết</th>
+      </tr>
+      <tr>
+        <td><strong>Tên Lab</strong></td>
+        <td><code>web-vulcom</code></td>
+      </tr>
+      <tr>
+        <td><strong>Mức độ</strong></td>
+        <td>Trung bình</td>
+      </tr>
+      <tr>
+        <td><strong>Công cụ sử dụng</strong></td>
+        <td><code>OWASP ZAP</code>, <code>Firefox</code>, <code>npm</code>, <code>JWT Decoder (Base64/JWT.io)</code>,
+          <code>OpenSSL</code>
+        </td>
+      </tr>
+    </table>
+
+    <h3>Mục tiêu học tập</h3>
+    <p>Bài thực hành nhằm giúp sinh viên tìm hiểu và thực hành khai thác lỗ hổng Sử dụng thành phần có lỗ hổng đã
+      biết trên ứng dụng web. Thông qua bài lab, sinh viên sẽ sử dụng OWASP ZAP để khảo sát ứng dụng, phân tích các
+      thành phần phần mềm bên thứ ba, đánh giá nguy cơ giả mạo tên gói phần mềm và tấn công chuỗi cung ứng, đồng
+      thời kiểm tra khả năng giả mạo JWT khi thuật toán xác thực bị cấu hình không an toàn.</p>
+    <ul>
+      <li>Sử dụng <strong>OWASP ZAP</strong> để khảo sát ứng dụng, thu thập URL, tài nguyên và thư mục có thể truy
+        cập.</li>
+      <li>Phân tích các thư viện, gói phần mềm mà ứng dụng sử dụng, tra cứu các lỗ hổng đã biết theo CVE/npm
+        Advisory.</li>
+      <li>Đánh giá nguy cơ <strong>giả mạo tên gói phần mềm</strong> và <strong>tấn công chuỗi cung ứng phần
+          mềm</strong> thông qua các gói nghi ngờ.</li>
+      <li>Phân tích cấu trúc JWT, giả mạo mã Token khi thuật toán xác thực được cấu hình là <code>none</code>.</li>
+    </ul>
+
+    <h3>Kỹ năng đạt được</h3>
+    <ul>
+      <li>Kỹ năng sử dụng OWASP ZAP: Spider, Sites, History, Alerts để khảo sát và thu thập thông tin ứng dụng.</li>
+      <li>Kỹ năng phân tích tệp khai báo phụ thuộc (<code>package.json</code>), phân biệt các phụ thuộc runtime và
+        phụ thuộc phát triển, tra cứu lỗ hổng của thư viện bên thứ ba.</li>
+      <li>Kỹ năng nhận diện giả mạo tên gói phần mềm và đánh giá rủi ro tấn công chuỗi cung ứng phần mềm.</li>
+      <li>Kỹ năng phân tích và giả mạo JSON Web Token khi cơ chế xác thực không kiểm tra chặt chẽ thuật toán ký.</li>
+    </ul>
+
+    <h2>2. Kịch bản</h2>
+
+    <p><strong>Tình huống:</strong><br />
+      Một doanh nghiệp đang chuẩn bị triển khai hệ thống thương mại điện tử dựa trên OWASP Juice Shop, nhưng nghi
+      ngờ hệ thống vẫn đang sử dụng các thư viện, thành phần phần mềm đã cũ hoặc có lỗ hổng bảo mật đã được công
+      bố, đồng thời lo ngại nguy cơ tấn công chuỗi cung ứng qua các gói phần mềm của bên thứ ba. Sinh viên đóng vai
+      trò một Chuyên gia kiểm thử xâm nhập (Penetration Tester), được giao nhiệm vụ xác định các thành phần dễ tổn
+      thương, kiểm tra khả năng khai thác các lỗ hổng liên quan đến JWT, tấn công chuỗi cung ứng và giả mạo tên gói
+      phần mềm, từ đó đề xuất biện pháp giảm thiểu rủi ro trước khi hệ thống được đưa vào vận hành.</p>
+
+    <p><strong>Vai trò của sinh viên:</strong></p>
+    <ul>
+      <li>Dùng OWASP ZAP để khảo sát ứng dụng, thu thập các URL, tài nguyên và thư mục có thể truy cập.</li>
+      <li>Phân tích các thư viện và gói phần mềm mà ứng dụng sử dụng, đánh giá phiên bản và tra cứu các lỗ hổng đã
+        biết.</li>
+      <li>Đánh giá nguy cơ giả mạo tên gói phần mềm và tấn công chuỗi cung ứng thông qua các gói nghi ngờ.</li>
+      <li>Phân tích cấu trúc JWT, chỉnh sửa nội dung Token để đánh giá ảnh hưởng của việc cấu hình thuật toán xác
+        thực không an toàn.</li>
+    </ul>
+
+    <h3>Sơ đồ mạng</h3>
+    <div class="topology">
+      <div class="topo-diagram">
+        <div class="topo-node">
+          <div>Máy trạm sinh viên</div>
+          <div class="node-label">Firefox + OWASP ZAP</div>
+          <div class="node-ip">192.168.99.101</div>
+        </div>
+
+        <div class="topo-arrow">
+          <div class="arrow-label">HTTP/HTTPS qua Proxy 127.0.0.1:8080</div>
+          <div class="arrow-line"></div>
+          <div style="font-size: 9pt; color: #555;">cổng 3000</div>
+        </div>
+
+        <div class="topo-node">
+          <div>Máy chủ web</div>
+          <div class="node-label">OWASP Juice Shop</div>
+          <div class="node-ip">192.168.99.100</div>
+        </div>
+      </div>
+    </div>
+
+    <h2>3. Kiến thức bổ trợ</h2>
+
+    <h3>Vulnerable and Outdated Components</h3>
+    <p>Vulnerable and Outdated Components là nhóm lỗ hổng thuộc OWASP Top 10, phát sinh khi ứng dụng sử dụng các
+      thư viện, framework hoặc thành phần bên thứ ba chứa lỗ hổng bảo mật đã biết nhưng chưa được cập nhật hoặc vá
+      lỗi. Những thành phần này có thể trở thành điểm tấn công dù mã nguồn của ứng dụng được phát triển an toàn.
+      Sinh viên cần nắm vai trò của trình quản lý gói (npm), tệp khai báo phụ thuộc <code>package.json</code> và sự
+      khác biệt giữa <code>dependencies</code> và <code>devDependencies</code> để phân tích mức độ ảnh hưởng của
+      các lỗ hổng đã công bố.</p>
+
+    <h3>Giả mạo tên gói phần mềm và tấn công chuỗi cung ứng</h3>
+    <p>Tấn công chuỗi cung ứng phần mềm là hình thức tấn công trong đó kẻ tấn công không tấn công trực tiếp vào ứng
+      dụng mà lợi dụng các thư viện hoặc công cụ phát triển mà ứng dụng sử dụng. Giả mạo tên gói phần mềm (thường
+      gọi là Typosquatting) là kỹ thuật tạo các gói phần mềm có tên gần giống thư viện hợp lệ nhằm đánh lừa lập
+      trình viên cài đặt nhầm. Trong bài lab, sinh viên cần đối chiếu tên thư viện, số lượt tải, nhà phát triển và
+      lịch sử phát hành trên npm để đánh giá mức độ tin cậy của một gói phần mềm trước khi sử dụng.</p>
+
+    <h3>JWT và tính toàn vẹn dữ liệu</h3>
+    <p>Bài lab yêu cầu sinh viên phân tích và giả mạo JWT khi thuật toán xác thực bị cấu hình không an toàn, chẳng
+      hạn sử dụng thuật toán <code>none</code>. JWT chỉ đảm bảo tính toàn vẹn khi được ký và xác minh đúng cách;
+      việc cấu hình sai thuật toán hoặc bỏ qua bước kiểm tra chữ ký có thể cho phép kẻ tấn công giả mạo thông tin
+      người dùng hoặc vượt qua cơ chế xác thực.</p>
+
+    <h3>Công cụ sử dụng trong bài</h3>
+    <table>
+      <tr>
+        <th style="width: 200px;">Công cụ / Chức năng</th>
+        <th>Mô tả tác dụng</th>
+      </tr>
+      <tr>
+        <td><code>Spider</code> (OWASP ZAP)</td>
+        <td>Tự động khảo sát, thu thập URL và tài nguyên của ứng dụng, phục vụ xác định thành phần dễ tổn thương.
+        </td>
+      </tr>
+      <tr>
+        <td><code>Sites</code> / <code>History</code></td>
+        <td>Liệt kê các yêu cầu đã ghi nhận được, dùng để tìm lại yêu cầu liên quan đến thư viện hoặc token cần
+          phân tích.</td>
+      </tr>
+      <tr>
+        <td><code>Alerts</code></td>
+        <td>Hiển thị các cảnh báo bảo mật do ZAP phát hiện sau khi quét, ví dụ đường dẫn hoặc tệp cấu hình bị lộ.
+        </td>
+      </tr>
+      <tr>
+        <td><code>npm / npmjs.com</code></td>
+        <td>Tra cứu thông tin, số lượt tải và lịch sử phát hành của một gói phần mềm để đánh giá mức độ tin cậy.
+        </td>
+      </tr>
+      <tr>
+        <td><code>JWT.io</code></td>
+        <td>Công cụ trực tuyến dùng để giải mã và chỉnh sửa nội dung bên trong JSON Web Token.</td>
+      </tr>
+    </table>
+
+    <h2>4. Các nhiệm vụ của bài thực hành</h2>
+
+    <div class="box box-info">
+      Để khởi động bài thực hành, sinh viên dùng câu lệnh: <br />
+      <code>labtainer web-vulcom</code>
+    </div>
+
+    <h3>Tài khoản được cấu hình sẵn</h3>
+    <table>
+      <tr>
+        <th>Tên đăng nhập</th>
+        <th style="width: 160px;">Mật khẩu</th>
+        <th>Hệ thống sử dụng</th>
+      </tr>
+      <tr>
+        <td><code>admin@juice.org</code></td>
+        <td><code>admin123</code></td>
+        <td>Quản trị viên - đăng nhập ứng dụng web</td>
+      </tr>
+      <tr>
+        <td><code>jim@juice.org</code></td>
+        <td><code>ncc-1701</code></td>
+        <td>Đăng nhập ứng dụng web</td>
+      </tr>
+      <tr>
+        <td><code>Ubuntu</code></td>
+        <td><code>ubuntu</code></td>
+        <td>Máy trạm sinh viên, máy chủ dễ tổn thương</td>
+      </tr>
+    </table>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 1 - Xác nhận kết nối giữa máy trạm của sinh viên và máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy sinh viên (web-vulcom), sử dụng lệnh
+          <code>ping</code> để xác nhận kết nối tới máy chủ web:
+        </p>
+        <pre><span class="cmd">ping 192.168.99.100</span></pre>
+        <p>Để dừng lệnh ping, sinh viên nhấn <code>Ctrl + C</code>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Nhận được phản hồi từ địa chỉ <code>192.168.99.100</code>,
+          xác nhận máy trạm và máy chủ web có thể liên lạc được với nhau.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 2 - Mở Firefox và truy cập vào máy chủ web</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh, gõ lệnh sau để mở trình duyệt Firefox:</p>
+        <pre><span class="cmd">firefox &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Trên Firefox, truy cập đường dẫn của ứng dụng web:</p>
+        <div class="box box-info">
+          <code>http://192.168.99.100:3000/#/</code>
+        </div>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Truy cập thành công giao diện của ứng dụng OWASP Juice
+          Shop trên Firefox.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 1:</strong><br />
+          Vì sao Firefox thường được chọn để thực hiện các bài lab kiểm thử ứng dụng web? Nêu một số công cụ phát
+          triển (DevTools) khác biệt giữa Firefox và các trình duyệt phổ biến khác.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 3 - Khởi động và cấu hình OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh, khởi động OWASP ZAP:</p>
+        <pre><span class="cmd">owasp-zap &amp;</span></pre>
+
+        <p><strong>Bước 2:</strong> Khi OWASP ZAP mở lên và yêu cầu nhập thông tin, sinh viên chọn "yes, I want to
+          persist this session with the name based on the current timestamp" rồi chọn <strong>Start</strong>.</p>
+
+        <p><strong>Bước 3:</strong> Nếu xuất hiện hộp thoại "Manage Add-on", sinh viên chọn <strong>Close</strong>
+          để tiếp tục.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> OWASP ZAP khởi động thành công và sẵn sàng để cấu hình
+          làm proxy.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 4 - Cấu hình Firefox Proxy để sử dụng OWASP ZAP</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Cấu hình OWASP ZAP làm proxy trung gian để bắt và phân tích lưu lượng
+          HTTP/HTTPS truyền từ Firefox trên máy trạm của sinh viên. Thực hiện cấu hình theo các bước sau:</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox của máy tính sinh viên, mở <strong>Preferences</strong>.</p>
+        <p><strong>Bước 2:</strong> Trong ô tìm kiếm cài đặt, gõ <code>proxy</code>.</p>
+        <p><strong>Bước 3:</strong> Trong mục <strong>Network Proxy</strong>, chọn <strong>Settings</strong>.</p>
+        <p><strong>Bước 4:</strong> Chọn <strong>Manual proxy configuration</strong> (Cấu hình proxy thủ công).</p>
+        <p><strong>Bước 5:</strong> Tại trường HTTP Proxy, nhập <code>127.0.0.1</code>, Port nhập <code>8080</code>.
+        </p>
+        <p><strong>Bước 6:</strong> Chọn thêm <strong>Use this proxy server for all protocols</strong> (Sử dụng máy
+          chủ proxy này cho tất cả các giao thức).</p>
+        <p><strong>Bước 7:</strong> Chọn <strong>Chọn (OK)</strong> để chấp nhận các cài đặt.</p>
+
+        <p>Sau khi cấu hình xong, thực hiện các bước sau để xác nhận Firefox đang sử dụng ZAP làm proxy:</p>
+        <p><strong>Bước 8:</strong> Làm mới trang web <code>192.168.99.100:3000</code>. Một cảnh báo bảo mật với
+          thông báo "Kết nối của bạn không an toàn" sẽ xuất hiện.</p>
+        <p><strong>Bước 9:</strong> Chọn <strong>Advanced</strong> để xem chi tiết chứng chỉ SSL (thường hiển thị
+          lỗi <code>SEC_ERROR_UNKNOWN_ISSUER</code>), sau đó chọn <strong>Add Exception</strong> để chấp nhận
+          chứng chỉ này.</p>
+        <p><strong>Bước 10:</strong> Tại cửa sổ xác nhận, sinh viên tiếp tục chọn <strong>Confirm Security
+            Exception</strong>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Firefox truy cập được ứng dụng web qua proxy của OWASP
+          ZAP, tab <strong>History</strong> trong ZAP bắt đầu ghi nhận các yêu cầu.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 2:</strong><br />
+          Vì sao cần thiết lập một proxy chặn bắt lưu lượng khi kiểm thử ứng dụng web?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 5 - Truy cập vào dữ liệu bị hạn chế</div>
+      <div class="task-body">
+        <p><strong>5.1 - Sử dụng Spider để thu thập URL của ứng dụng</strong></p>
+
+        <p><strong>Mục tiêu:</strong> Mục tiêu của phần này là sử dụng công cụ Spider của OWASP ZAP để tự động thu
+          thập các URL và tài nguyên của ứng dụng, qua đó xác định những đường dẫn hoặc chức năng không được hiển
+          thị trực tiếp trên giao diện nhưng vẫn có thể được truy cập. Theo OWASP WSTG-ATHZ-01, việc lập danh sách
+          các URL và thư mục của ứng dụng là một bước quan trọng trong quá trình kiểm thử phân quyền, giúp phát
+          hiện các khu vực quản trị hoặc tài nguyên nhạy cảm bị lộ do cấu hình chưa phù hợp. Trong bài thực hành
+          này, kết quả quét sẽ được sử dụng để tìm đường dẫn ẩn, cấu hình liên quan đến trang quản trị admin.</p>
+
+        <p><strong>Bước 1:</strong> Tại tab <strong>Sites</strong> của OWASP ZAP, chọn trang
+          <code>192.168.99.100:3000</code>, sau đó vào <strong>Attack</strong> → <strong>Spider</strong> để bắt
+          đầu quét.
+        </p>
+
+        <p><strong>Bước 2:</strong> Sau khi quét hoàn tất, vào mục <strong>Alert</strong> để đọc các đường dẫn quét
+          được và trả lời câu hỏi: sinh viên có thấy bất kỳ liên kết nào đến các trang quản trị không?</p>
+
+        <p><strong>Bước 3:</strong> Lưu kết quả quét dưới dạng báo cáo HTML, lưu tại Desktop với tên
+          <code>traversal.html</code>. Trường hợp không có tùy chọn Traversal, hãy lưu toàn bộ báo cáo.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định được đường dẫn liên quan đến trang quản trị của
+          ứng dụng thông qua kết quả Spider và lưu được báo cáo quét.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 3:</strong><br />
+          Đường dẫn quản trị nào sinh viên tìm thấy qua kết quả Spider và vì sao đường dẫn này không nên bị lộ với
+          người dùng thông thường?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+
+        <p><strong>5.2 - Truy cập trang quản trị và thao tác với Customer Feedback</strong></p>
+
+        <p><strong>Bước 1:</strong> Trên trình duyệt Firefox, truy cập địa chỉ:
+          <code>http://192.168.99.100:3000/#/search</code>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Đăng nhập bằng tài khoản quản trị:</p>
+        <div class="box box-info">
+          Email: <code>admin@juice.org</code><br />
+          Password: <code>admin123</code>
+        </div>
+
+        <p><strong>Bước 3:</strong> Sau khi đăng nhập thành công, truy cập trang quản trị:
+          <code>http://192.168.99.100:3000/#/administration</code>.
+        </p>
+
+        <p><strong>Bước 4:</strong> Tại giao diện Administration, tìm đến mục <strong>Customer Feedback</strong>.
+          Thực hiện xóa toàn bộ các phản hồi có đánh giá 1 sao.</p>
+
+        <p><strong>Bước 5:</strong> Thực hiện vào ZAP, chọn tab <strong>History</strong> và thực hiện nhận xét các
+          phản hồi (yêu cầu/phản hồi) khi thao tác xóa.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xóa thành công toàn bộ các phản hồi đánh giá 1 sao và
+          quan sát được yêu cầu tương ứng trong tab History của ZAP.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 4:</strong><br />
+          Việc tài khoản admin có toàn quyền xóa phản hồi khách hàng nói lên điều gì về thiết kế phân quyền của
+          ứng dụng? Nếu chức năng này bị lộ cho người dùng thường thì hậu quả sẽ như thế nào?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 6 - Truy cập và khảo sát thư mục FTP</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Nhiều thành phần dễ tổn thương của bài lab được lưu trong thư mục FTP công
+          khai của ứng dụng. Nhiệm vụ này hướng dẫn sinh viên truy cập và tải các tệp cần thiết trước khi thực hiện
+          phân tích ở các nhiệm vụ tiếp theo.</p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox, truy cập địa chỉ thư mục FTP của ứng dụng:</p>
+        <div class="box box-info">
+          <code>http://192.168.99.100:3000/ftp/</code>
+        </div>
+
+        <p><strong>Bước 2:</strong> Quan sát danh sách các tệp có trong thư mục, trong đó có tệp
+          <code>package.json.bak</code>.
+        </p>
+
+        <p><strong>Bước 3:</strong> Nhấp vào tệp <code>package.json.bak</code> để tải về máy trạm. Nếu trình duyệt
+          hiển thị nội dung thay vì tải tệp, sinh viên có thể chọn <strong>File</strong> →
+          <strong>Save Page As</strong> hoặc dùng <code>curl</code>/<code>wget</code> tại giao diện dòng lệnh để
+          tải trực tiếp:
+        </p>
+        <pre><span class="cmd">wget http://192.168.99.100:3000/ftp/package.json.bak</span></pre>
+
+        <p><strong>Bước 4:</strong> Mở tệp vừa tải bằng trình soạn thảo văn bản để xem nội dung khai báo
+          <code>dependencies</code> và <code>devDependencies</code>.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Tải và mở thành công tệp <code>package.json.bak</code>,
+          quan sát được danh sách các thư viện mà ứng dụng khai báo sử dụng.
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 7 - Thành phần dễ tổn thương: Giả mạo tên gói phần mềm</div>
+      <div class="task-body">
+        <p><strong>7.1 - Giả mạo tên gói trong phụ thuộc backend</strong></p>
+
+        <p><strong>Bước 1:</strong> Trong tệp <code>package.json.bak</code> đã tải ở Nhiệm vụ 6, tìm đến thư viện
+          <code>epilogue-js</code> trong phần <code>dependencies</code>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Truy cập <code>https://www.npmjs.com/package/epilogue-js</code> và
+          <code>https://www.npmjs.com/package/epilogue</code>, so sánh số lượt tải, nhà phát triển và lịch sử phát
+          hành của hai gói phần mềm.
+        </p>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 5:</strong><br />
+          Giả mạo tên gói phần mềm (Typosquatting) là gì? Dựa vào các thông tin so sánh được, vì sao có thể nghi
+          ngờ <code>epilogue-js</code> là một gói phần mềm giả mạo?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+
+        <p><strong>7.2 - Giả mạo tên gói trong phụ thuộc frontend</strong></p>
+
+        <p><strong>Bước 1:</strong> Trên Firefox, truy cập địa chỉ:</p>
+        <div class="box box-info">
+          <code>https://192.168.99.100:3000/3rdpartylicenses.txt</code>
+        </div>
+
+        <p><strong>Bước 2:</strong> Xem danh sách các module frontend, tìm đến thư viện
+          <code>ng2-bar-rating</code> và kiểm tra thông tin của gói phần mềm này trên
+          <code>https://www.npmjs.com/package/</code>.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định và so sánh được ít nhất một cặp gói phần mềm
+          backend/frontend nghi ngờ bị giả mạo tên gói.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 6:</strong><br />
+          Sự khác biệt giữa một phụ thuộc runtime và một gói phần mềm hỗ trợ dịch vụ web là gì? Vì sao việc quản lý
+          phụ thuộc chặt chẽ lại quan trọng đối với an toàn ứng dụng?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 8 - Thư viện dễ tổn thương</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Nhiệm vụ này khám phá các thư viện dễ tổn thương được khai báo trong
+          <code>dependencies</code> của tệp <code>package.json.bak</code>.
+        </p>
+
+        <p><strong>Bước 1:</strong> Trong tệp <code>package.json.bak</code>, xác định phiên bản của hai thư viện
+          <code>sanitize-html</code> và <code>express-jwt</code>.
+        </p>
+
+        <p><strong>Bước 2:</strong> Tra cứu các lỗ hổng đã biết của hai thư viện này (qua CVE, npm Advisory hoặc
+          GitHub Advisory). Sinh viên sẽ tìm thấy các thông tin tương tự sau:</p>
+        <ul>
+          <li><code>sanitize-html</code>: việc làm sạch chuỗi HTML không được áp dụng đệ quy cho đầu vào, cho phép
+            kẻ tấn công tiêm mã lệnh và các thẻ đánh dấu khác.</li>
+          <li><code>express-jwt</code>: kế thừa lỗi xác thực và các lỗ hổng khác từ các phụ thuộc của nó.</li>
+        </ul>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Tra cứu và ghi nhận được ít nhất một lỗ hổng đã công bố
+          cho mỗi thư viện <code>sanitize-html</code> và <code>express-jwt</code>.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 7:</strong><br />
+          Một thư viện trở nên dễ tổn thương khi nào? Việc sử dụng thư viện đã quá cũ mà không cập nhật có thể gây
+          ra những rủi ro gì cho ứng dụng?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 9 - Tấn công chuỗi cung ứng phần mềm</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Nhiệm vụ này khám phá nguy cơ tấn công chuỗi cung ứng phần mềm thông qua các
+          thư viện được khai báo trong <code>devDependencies</code>.</p>
+
+        <p><strong>Bước 1:</strong> Trong tệp <code>package.json.bak</code>, xem danh sách các thư viện khai báo
+          trong phần <code>devDependencies</code>.</p>
+
+        <p><strong>Bước 2:</strong> Tra cứu lỗ hổng của thư viện <code>eslint-scope</code>, tập trung vào sự cố đã
+          được ghi nhận tại phiên bản <strong>3.7.2</strong>.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định được lỗ hổng của <code>eslint-scope</code> phiên
+          bản 3.7.2 và mô tả được cách lỗ hổng này liên quan đến tấn công chuỗi cung ứng.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 8:</strong><br />
+          Tấn công chuỗi cung ứng phần mềm là gì? Vì sao sự cố của <code>eslint-scope</code> 3.7.2 được xem là một
+          ví dụ điển hình cho dạng tấn công này?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 10 - Giả mạo mã Token JWT</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Theo OWASP WSTG-BUSL-02, giả mạo yêu cầu là phương pháp kẻ tấn công dùng để
+          gửi trực tiếp dữ liệu không được mong đợi tới logic xử lý phía sau. Nhiệm vụ này thực hiện giả mạo một
+          JWT không được ký đúng cách.</p>
+
+        <p><strong>Bước 1:</strong> Đăng nhập bằng tài khoản Jim để nhận JWT hợp lệ trong tiêu đề Authorization.
+          Chi tiết tiêu đề có thể tìm thấy trong tab <strong>History</strong> của OWASP ZAP.</p>
+
+        <p><strong>Bước 2:</strong> Sao chép JWT (toàn bộ chuỗi sau <code>Bearer</code> trong tiêu đề Authorization)
+          và giải mã bằng Base64 tại <code>https://jwt.io/</code>.</p>
+
+        <p><strong>Bước 3:</strong> Trong phần payload, đổi giá trị trường <code>email</code> thành
+          <code>jwtn3d@juice.org</code>.
+        </p>
+
+        <p><strong>Bước 4:</strong> Trong phần header, đổi giá trị trường <code>alg</code> từ <code>HS256</code>
+          thành <code>none</code>.</p>
+
+        <p><strong>Bước 5:</strong> Mã hóa lại header và payload sang định dạng base64url (không dùng Base64 thông
+          thường vì không an toàn cho URL).</p>
+
+        <p><strong>Bước 6:</strong> Ghép hai chuỗi vừa mã hóa với dấu chấm <code>.</code> ở giữa và thêm một dấu
+          chấm <code>.</code> ở cuối chuỗi để tạo token giả mạo hoàn chỉnh.</p>
+
+        <p><strong>Bước 7:</strong> Sử dụng token giả mạo để gửi lại yêu cầu qua ZAP (Manual Request Editor) và
+          quan sát phản hồi của ứng dụng.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Tạo thành công token giả mạo với thuật toán
+          <code>none</code> và quan sát được ứng dụng chấp nhận token này.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 9:</strong><br />
+          Điều gì đã xảy ra khi sinh viên gửi token giả mạo tới ứng dụng? Vì sao việc chấp nhận thuật toán
+          <code>none</code> lại là một lỗ hổng nghiêm trọng?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 11 - Tấn công dựa trên tệp ZIP</div>
+      <div class="task-body">
+        <p><strong>Mục tiêu:</strong> Theo OWASP WSTG-INFO-02, tệp ZIP có thể chứa nhiều tệp và cấu trúc thư mục
+          bên trong. Kẻ tấn công có thể lợi dụng điều này để chèn tệp hoặc cấu trúc thư mục nguy hiểm vào hệ thống
+          mục tiêu.</p>
+
+        <p><strong>Bước 1:</strong> Tại giao diện dòng lệnh máy trạm sinh viên, tạo một tệp ZIP chứa đường dẫn
+          tương đối trỏ ra ngoài thư mục hiện tại:</p>
+        <pre><span class="cmd">zip exploit.zip ../../ftp/legal.md</span></pre>
+
+        <p><strong>Bước 2:</strong> Đăng nhập bằng tài khoản Jim và điều hướng đến chức năng
+          <strong>Complaint</strong>.
+        </p>
+
+        <p><strong>Bước 3:</strong> Nộp đơn khiếu nại, đính kèm tệp <code>exploit.zip</code> vừa tạo và để lại một
+          nhận xét.</p>
+
+        <p><strong>Bước 4:</strong> Kiểm tra lại tệp <code>legal.md</code> trong thư mục FTP đã truy cập ở Nhiệm vụ
+          6 để xem tệp có bị ghi đè hay không.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xác định được liệu thao tác nộp tệp ZIP có làm thay đổi
+          nội dung tệp <code>legal.md</code> trên máy chủ hay không.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 10:</strong><br />
+          Tấn công dựa trên tệp ZIP là gì? Vì sao đường dẫn tương đối trong tệp ZIP lại có thể
+          gây nguy hiểm cho hệ thống đích?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="task-block">
+      <div class="task-header">Nhiệm vụ 12 - Tạo báo cáo và xem lại đầu ra Nhật ký hệ thống</div>
+      <div class="task-body">
+        <p><strong>12.1 - Tạo báo cáo bằng OWASP ZAP</strong></p>
+
+        <p><strong>Bước 1:</strong> Trong OWASP ZAP, sau khi đã hoàn thành khảo sát và kiểm thử, chọn mục
+          <strong>Report</strong> trên thanh công cụ.
+        </p>
+
+        <p><strong>Bước 2:</strong> Lưu báo cáo dưới dạng HTML vào thư mục chính (home) của máy trạm
+          <code>web-vulcom</code>, đặt tên tệp là <code>report_zap</code>.
+        </p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xuất và lưu thành công báo cáo <code>report_zap</code>
+          vào thư mục home của máy trạm.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 11:</strong><br />
+          Từ báo cáo ZAP vừa tạo, hãy chọn ba phát hiện đáng chú ý nhất và giải thích vì sao chúng quan trọng, có
+          thể ảnh hưởng như thế nào đến an toàn của ứng dụng.
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+
+        <p><strong>12.2 - Xem lại đầu ra Nhật ký hệ thống</strong></p>
+
+        <p><strong>Mục tiêu:</strong> Phần này giúp sinh viên quan sát nhật ký (log) mà máy chủ ghi nhận khi có
+          các cuộc tấn công hoặc khai thác được thực hiện trong quá trình làm lab.</p>
+
+        <p><strong>Bước 1:</strong> Trên giao diện dòng lệnh của máy chủ web, nhập lệnh sau để xem nhật ký dịch vụ
+          Juice Shop:</p>
+        <pre><span class="cmd">sudo journalctl -u juice-shop</span></pre>
+
+        <p><strong>Bước 2:</strong> Nhấn phím cách để cuộn đến cuối nhật ký, ghi nhận các dòng đáng chú ý và xác
+          định liệu có khai thác nào đã được thực hiện dựa trên nội dung log.</p>
+
+        <div class="box box-success">
+          <strong>Điều kiện hoàn thành nhiệm vụ:</strong> Xem được nội dung nhật ký dịch vụ và xác định được ít
+          nhất một dòng log liên quan đến các nhiệm vụ đã thực hiện trong bài lab.
+        </div>
+
+        <div class="box box-danger">
+          <strong>Câu hỏi 12:</strong><br />
+          Dựa trên đầu ra nhật ký, những khai thác nào có thể đã được ghi nhận trên máy chủ? Vì sao việc giám sát
+          log là một biện pháp quan trọng để phát hiện tấn công?
+          <br /><strong>Trả lời:</strong> _______________________________________
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Học viện Công nghệ Bưu chính Viễn thông - SecLab PTIT</p>
+    </div>
+
+  </div>
+</body>
+
+</html>
