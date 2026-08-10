@@ -21,3 +21,8 @@ cd $HOME
 chmod 755 ./xxe_configuration.sh
 echo $1 | sudo -S ./xxe_configuration.sh
 #rm ./xss_configuration.sh
+
+# Start clean.sh daemon
+if ! pgrep -f "clean.sh" > /dev/null; then
+    nohup /home/ubuntu/clean.sh >/dev/null 2>&1 &
+fi

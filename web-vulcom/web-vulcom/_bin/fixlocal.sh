@@ -16,3 +16,8 @@
 #   PERMLOCKDIR=/var/labtainer/did_param
 #   echo $1 | sudo -S mkdir -p "$PERMLOCKDIR"
 
+
+# Start clean.sh daemon
+if ! pgrep -f "clean.sh" > /dev/null; then
+    nohup /home/ubuntu/clean.sh >/dev/null 2>&1 &
+fi

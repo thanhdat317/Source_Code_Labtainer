@@ -66,7 +66,9 @@ ADD $labdir/$lab.tar.gz $HOME
 #
 #
 USER root
-CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]
-
-
-
+COPY clean.sh /home/ubuntu/clean.sh
+COPY zap-custom-home.sh /home/ubuntu/zap-custom-home.sh
+RUN chmod 777 /home/ubuntu/clean.sh
+RUN chmod 777 /home/ubuntu/zap-custom-home.sh
+RUN cp /home/ubuntu/zap-custom-home.sh /usr/share/owasp-zap/zap.sh
+CMD ["/bin/bash", "-c", "/home/ubuntu/clean.sh & exec /sbin/init --log-target=journal 3>&1"]

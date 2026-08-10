@@ -33,29 +33,8 @@ ENV APT_SOURCE $apt_source
 RUN /usr/bin/apt-source.sh
 #
 #
-#****Install main software****
-RUN apt update && apt install -y build-essential wget curl npm git nodejs
-RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-#****Install main software****
 #
-#*******OWASP INSTALL******
-#RUN sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/cabelo/xUbuntu_18.04/ /' > /etc/apt/sources.list.d home:cabelo.list" 
-RUN sudo sh -c "echo 'deb http://download.opensuse.org/repositories/home:/cabelo/xUbuntu_17.10/ /' > /etc/apt/sources.list.d/home:cabelo.list"
-RUN sudo wget -nv https://download.opensuse.org/repositories/home:cabelo/xUbuntu_18.04/Release.key -O Release.key 
-RUN sudo apt-key add - < Release.key 
-RUN apt-get update 
-RUN apt-get install -y owasp-zap
-#to run owasp zap at the terminal run owasp-zap
-#*******OWASP INSTALL******
-#
-#****Nano&Curl install****
-RUN sudo apt-get install -y nano
-RUN sudo apt-get install -y curl
-#****Nano install****
-#
-#****Authenticator Install****
-#RUN git https://github.com/Authenticator-Extension/Authenticator.git
-#RUN cd /Authenticator & npm install
+#  put package installation here
 #
 # Install the system files found in the _system directory
 #
@@ -87,7 +66,9 @@ ADD $labdir/$lab.tar.gz $HOME
 #  The first thing that executes on the container.
 #
 USER root
-CMD ["/bin/bash", "-c", "exec /sbin/init --log-target=journal 3>&1"]
-
-
-
+COPY clean.sh /home/ubuntu/clean.sh
+COPY zap-custom-home.sh /home/ubuntu/zap-custom-home.sh
+RUN chmod 777 /home/ubuntu/clean.sh
+RUN chmod 777 /home/ubuntu/zap-custom-home.sh
+RUN cp /home/ubuntu/zap-custom-home.sh /usr/share/owasp-zap/zap.sh
+CMD ["/bin/bash", "-c", "/home/ubuntu/clean.sh & exec /sbin/init --log-target=journal 3>&1"]
