@@ -47,7 +47,7 @@ fi
 
 DEFAULTJAVAGC="-XX:+UseG1GC"
 
-JAVA_VERSION=$(java -version 2>&1 | awk -F" '/version/ { print $2 }')
+JAVA_VERSION=$(java -version 2>&1 | awk -F\" '/version/ { print $2 }')
 JAVA_MAJOR_VERSION=${JAVA_VERSION%%[.|-]*}
 JAVA_MINOR_VERSION=$(echo $JAVA_VERSION | awk -F\. '{ print $2 }')
 
@@ -73,9 +73,9 @@ if [ -f "$JVMPROPS" ]; then
   # Local jvm properties file present
   JMEM=$(head -1 "$JVMPROPS")
 elif [ "$OS" = "Linux" ]; then
-  MEM=$(expr $(sed -n 's/MemTotal:[ ]\{1,\}\([0-9]\{1,\}\) kB//p' /proc/meminfo) / 1024)
+  MEM=$(expr $(sed -n 's/MemTotal:[ ]\{1,\}\([0-9]\{1,\}\) kB/\1/p' /proc/meminfo) / 1024)
 elif [ "$OS" = "Darwin" ]; then
-  MEM=$(system_profiler SPMemoryDataType | sed -n -e 's/.*Size: \([0-9]\{1,\}\) GB//p' | awk '{s+=$0} END {print s*1024}')
+  MEM=$(system_profiler SPMemoryDataType | sed -n -e 's/.*Size: \([0-9]\{1,\}\) GB/\1/p' | awk '{s+=$0} END {print s*1024}')
 elif [ "$OS" = "SunOS" ]; then
   MEM=$(/usr/sbin/prtconf | awk '/Memory/{print $3}')
 elif [ "$OS" = "FreeBSD" ]; then
