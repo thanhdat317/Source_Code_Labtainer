@@ -1,0 +1,15 @@
+#!/bin/bash
+# prestop script to dump logs and check registered admin
+mkdir -p /home/ubuntu/.local/result
+
+# Dump journalctl logs
+sudo journalctl -u juice-shop --no-pager > /home/ubuntu/.local/result/journalctl.stdout
+sudo journalctl -u juice-shop --no-pager > /home/ubuntu/.local/result/journalctl.stdout.log
+
+# Check if a new admin user was registered (excluding default admin@juice.org)
+if [ -f /juice-shop_7.5.1/data/juiceshop.sqlite ]; then
+   sudo sqlite3 /juice-shop_7.5.1/data/juiceshop.sqlite "SELECT email FROM Users WHERE role='admin' AND email != 'admin@juice.org';" > /home/ubuntu/.local/result/admin_registered.txt
+else
+   echo "No DB found" > /home/ubuntu/.local/result/admin_registered.txt
+fi
+chmod 666 /home/ubuntu/.local/result/*
