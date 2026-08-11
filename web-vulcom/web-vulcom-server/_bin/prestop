@@ -1,0 +1,4 @@
+#!/bin/bash
+mkdir -p /home/ubuntu/.local/result
+sudo journalctl -u juice-shop --no-pager > /home/ubuntu/.local/result/journalctl.stdout
+chmod 666 /home/ubuntu/.local/result/journalctl.stdout
