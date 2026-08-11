@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# OWASP ZAP stores bulky session data, browser drivers, logs and caches under
+# ~/.ZAP.  The web-brokenauth grader uses server-side Juice Shop evidence, not
+# ZAP's transient runtime state.  Remove it before Labtainer zips the student
+# home directory so checkwork/stoplab output stays below the target size after
+# students run a real ZAP scan.
+rm -rf /home/ubuntu/.ZAP
+
+exit 0

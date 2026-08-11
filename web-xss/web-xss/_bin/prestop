@@ -6,3 +6,10 @@ if [ -f "/home/ubuntu/report_zap.html" ] || [ -f "/home/ubuntu/report_zap" ] || 
 else
    echo "zap_report_missing" > "$outpath/zap_report.txt"
 fi
+
+# OWASP ZAP stores bulky session data, browser drivers, logs and caches under
+# ~/.ZAP.  Those runtime files are not used by grading and can make the final
+# Labtainer .lab artifact tens of MB larger after a normal ZAP scan.  Keep the
+# exported report_zap.html above, but remove the transient ZAP state before
+# Labtainer zips the student home directory.
+rm -rf /home/ubuntu/.ZAP
